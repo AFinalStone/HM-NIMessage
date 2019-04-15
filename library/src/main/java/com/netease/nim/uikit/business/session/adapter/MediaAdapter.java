@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
+import com.hm.iou.tools.ImageLoader;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.business.session.activity.WatchMessagePictureActivity;
 import com.netease.nim.uikit.business.session.activity.WatchVideoActivity;
@@ -105,7 +105,8 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 } else if (!TextUtils.isEmpty(imageAttachment.getPath())) {
                     path = imageAttachment.getPath();
                 }
-                Glide.with(context).load(path).into(((MediaViewHolder) holder).mediaImage);
+//                Glide.with(context).load(path).into(((MediaViewHolder) holder).mediaImage);
+                ImageLoader.getInstance(context).displayImage(path, ((MediaViewHolder) holder).mediaImage);
                 ((MediaViewHolder) holder).mediaImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -121,7 +122,8 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 } else if (!TextUtils.isEmpty(videoAttachment.getPath())) {
                     path = videoAttachment.getPath();
                 }
-                Glide.with(context).load(path).into(((MediaViewHolder) holder).mediaImage);
+//                Glide.with(context).load(path).into(((MediaViewHolder) holder).mediaImage);
+                ImageLoader.getInstance(context).displayImage(path, ((MediaViewHolder) holder).mediaImage);
                 ((MediaViewHolder) holder).mediaImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

@@ -4,8 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.hm.iou.tools.ImageLoader;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.business.robot.parser.elements.element.ImageElement;
 import com.netease.nim.uikit.common.ui.imageview.MsgThumbImageView;
@@ -42,13 +41,14 @@ public class RobotImageView extends RobotViewBase<ImageElement> {
         if (TextUtils.isEmpty(url)) {
             return;
         }
-        Glide.with(getContext())
-                .asBitmap()
-                .load(url)
-                .apply(new RequestOptions()
-                        .centerCrop()
-                        .placeholder(R.drawable.nim_message_item_round_bg))
-                .into(thumbnail);
+//        Glide.with(getContext())
+//                .asBitmap()
+//                .load(url)
+//                .apply(new RequestOptions()
+//                        .centerCrop()
+//                        .placeholder(R.drawable.nim_message_item_round_bg))
+//                .into(thumbnail);
+        ImageLoader.getInstance(getContext()).displayImage(url, thumbnail, R.drawable.nim_message_item_round_bg, R.drawable.nim_message_item_round_bg);
     }
 
     @Override

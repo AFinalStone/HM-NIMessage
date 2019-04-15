@@ -8,17 +8,11 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.request.RequestOptions;
+import com.hm.iou.tools.ImageLoader;
 import com.netease.nim.uikit.R;
-import com.netease.nim.uikit.common.util.media.ImageUtil;
 
-import java.io.File;
-
-public class MsgThumbImageView extends ImageView {
+public class MsgThumbImageView extends android.support.v7.widget.AppCompatImageView {
 
     public MsgThumbImageView(Context context) {
         super(context);
@@ -95,7 +89,8 @@ public class MsgThumbImageView extends ImageView {
 
     public void loadAsResource(final int resId, final int maskId) {
         setBlendDrawable(maskId);
-        Glide.with(getContext().getApplicationContext()).load(resId).into(this);
+//        Glide.with(getContext().getApplicationContext()).load(resId).into(this);
+        ImageLoader.getInstance(getContext()).displayImage(resId, this);
     }
 
     public void loadAsPath(final String path, final int width, final int height, final int maskId, final String ext) {
@@ -106,23 +101,24 @@ public class MsgThumbImageView extends ImageView {
 
         setBlendDrawable(maskId);
 
-        RequestBuilder builder;
-        if (ImageUtil.isGif(ext)) {
-            builder = Glide.with(getContext().getApplicationContext()).asGif().load(new File(path));
-        } else {
-            RequestOptions options = new RequestOptions()
-                    .override(width, height)
-                    .fitCenter()
-                    .placeholder(R.drawable.nim_image_default)
-                    .error(R.drawable.nim_image_default);
-
-            builder = Glide.with(getContext().getApplicationContext())
-                    .asBitmap()
-                    .apply(options)
-                    .load(new File(path))
-            ;
-        }
-        builder.into(this);
+//        RequestBuilder builder;
+//        if (ImageUtil.isGif(ext)) {
+//            builder = Glide.with(getContext().getApplicationContext()).asGif().load(new File(path));
+//        } else {
+//            RequestOptions options = new RequestOptions()
+//                    .override(width, height)
+//                    .fitCenter()
+//                    .placeholder(R.drawable.nim_image_default)
+//                    .error(R.drawable.nim_image_default);
+//
+//            builder = Glide.with(getContext().getApplicationContext())
+//                    .asBitmap()
+//                    .apply(options)
+//                    .load(new File(path))
+//            ;
+//        }
+//        builder.into(this);
+        ImageLoader.getInstance(getContext()).displayImage(path, this, R.drawable.nim_image_default, R.drawable.nim_image_default);
     }
 
     private void setBlendDrawable(int maskId) {

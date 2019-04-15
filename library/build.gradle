@@ -32,15 +32,14 @@ dependencies {
     compile 'me.everything:overscroll-decor-android:1.0.4'
     compile "me.leolin:ShortcutBadger:1.1.17@aar"
 
-    compile 'com.github.bumptech.glide:glide:4.2.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.2.0'
-    compile 'jp.wasabeef:glide-transformations:3.0.1'
     //api 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1' // if you want to use the Glide GPU Filters
 
     api 'com.alibaba:fastjson:1.1.70.android'
     api 'com.netease.nimlib:basesdk:6.2.0'
     api 'com.netease.nimlib:chatroom:6.2.0'
     api 'com.netease.nimlib:lucene:6.2.0'
+
+    compile 'com.heima.iou:hmbasebizlocal:1.0.0'
 
 }
 apply from: './maven_local.gradle'

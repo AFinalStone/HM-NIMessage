@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.hm.iou"
+        applicationId "com.netease.im.demo"
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
@@ -52,10 +52,13 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     testImplementation 'junit:junit:4.12'
     //noinspection GradleDependency
-    compile 'com.heima.iou:hmbasebizlocal:1.0.0'
-    compile 'com.heima.iou:hmcityselectlocal:1.0.0'
     compile 'com.android.support:multidex:1.0.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    api 'com.alibaba:fastjson:1.1.70.android'
+    api 'com.netease.nimlib:basesdk:6.2.0'
+    api 'com.netease.nimlib:chatroom:6.2.0'
+    api 'com.netease.nimlib:lucene:6.2.0'
     implementation project(':library')
 }

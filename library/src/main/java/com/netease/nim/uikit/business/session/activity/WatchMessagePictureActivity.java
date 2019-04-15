@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import com.hm.iou.tools.ImageLoader;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.wrapper.NimToolBarOptions;
 import com.netease.nim.uikit.common.activity.ToolBarOptions;
@@ -200,11 +200,13 @@ public class WatchMessagePictureActivity extends UI {
         String path = ((ImageAttachment) message.getAttachment()).getPath();
         String thumbPath = ((ImageAttachment) message.getAttachment()).getThumbPath();
         if (!TextUtils.isEmpty(path)) {
-            Glide.with(this).asGif().load(new File(path)).into(simpleImageView);
+//            Glide.with(this).asGif().load(new File(path)).into(simpleImageView);
+            ImageLoader.getInstance(this).displayImage(new File(path), simpleImageView);
             return;
         }
         if (!TextUtils.isEmpty(thumbPath)) {
-            Glide.with(this).asGif().load(new File(thumbPath)).into(simpleImageView);
+            ImageLoader.getInstance(this).displayImage(new File(thumbPath), simpleImageView);
+//            Glide.with(this).asGif().load(new File(thumbPath)).into(simpleImageView);
         }
 
         if (message.getDirect() == MsgDirectionEnum.In) {
@@ -220,7 +222,7 @@ public class WatchMessagePictureActivity extends UI {
             @Override
             public void onSuccess(List<IMMessage> param) {
                 for (IMMessage imMessage : param) {
-                    if (!ImageUtil.isGif(((ImageAttachment) imMessage.getAttachment()).getExtension())){
+                    if (!ImageUtil.isGif(((ImageAttachment) imMessage.getAttachment()).getExtension())) {
                         imageMsgList.add(imMessage);
                     }
                 }

@@ -18,7 +18,6 @@ import com.netease.nim.uikit.common.activity.UI;
 import com.netease.nim.uikit.common.media.picker.fragment.PickerAlbumFragment;
 import com.netease.nim.uikit.common.media.picker.fragment.PickerAlbumFragment.OnAlbumItemClickListener;
 import com.netease.nim.uikit.common.media.picker.fragment.PickerImageFragment;
-import com.netease.nim.uikit.common.media.picker.loader.PickerImageLoader;
 import com.netease.nim.uikit.common.media.picker.model.AlbumInfo;
 import com.netease.nim.uikit.common.media.picker.model.PhotoInfo;
 import com.netease.nim.uikit.common.media.picker.model.PickerContract;
@@ -286,15 +285,4 @@ public class PickerAlbumActivity extends UI implements OnAlbumItemClickListener,
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        PickerImageLoader.initCache();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        PickerImageLoader.clearCache();
-    }
 }

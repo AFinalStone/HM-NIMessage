@@ -830,22 +830,22 @@ public class MessageListPanelEx {
 
             MessageAudioControl.getInstance(container.activity).stopAudio();
 
-            // 0 EarPhoneMode
+            // 0 EarPhoneMode-----语音是通过扬声器还是耳机进行播放
             longClickItemEarPhoneMode(alertDialog, msgType);
-            // 1 resend
+            // 1 resend-----重发
             longClickItemResend(selectedItem, alertDialog);
-            // 2 copy
+            // 2 copy-----复制
             longClickItemCopy(selectedItem, alertDialog, msgType);
-            // 3 revoke
+            // 3 revoke-----撤回
             if (enableRevokeButton(selectedItem)) {
                 longClickRevokeMsg(selectedItem, alertDialog);
             }
-            // 4 delete
+            // 4 delete-----删除
             longClickItemDelete(selectedItem, alertDialog);
-            // 5 trans
-            longClickItemVoidToText(selectedItem, alertDialog, msgType);
-
-            if (!NimUIKitImpl.getMsgForwardFilter().shouldIgnore(selectedItem) && !recordOnly) {
+            // 5 trans-----语音转化为文字
+//            longClickItemVoidToText(selectedItem, alertDialog, msgType);
+            //------消息转发
+            if (NimUIKitImpl.getMsgForwardFilter() != null && !NimUIKitImpl.getMsgForwardFilter().shouldIgnore(selectedItem) && !recordOnly) {
                 // 6 forward to person
                 longClickItemForwardToPerson(selectedItem, alertDialog);
                 // 7 forward to team
@@ -855,6 +855,7 @@ public class MessageListPanelEx {
 
         private boolean enableRevokeButton(IMMessage selectedItem) {
             if (selectedItem.getStatus() == MsgStatusEnum.success
+                    && NimUIKitImpl.getMsgRevokeFilter() != null
                     && !NimUIKitImpl.getMsgRevokeFilter().shouldIgnore(selectedItem)
                     && !recordOnly) {
                 if (selectedItem.getDirect() == MsgDirectionEnum.Out) {

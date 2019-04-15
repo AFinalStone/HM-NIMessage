@@ -1,17 +1,13 @@
 package com.netease.nim.uikit.common.ui.imageview;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.hm.iou.tools.ImageLoader;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.NimUIKit;
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
-import com.netease.nimlib.sdk.nos.model.NosThumbParam;
-import com.netease.nimlib.sdk.nos.util.NosThumbImageUtil;
 import com.netease.nimlib.sdk.robot.model.RobotAttachment;
 import com.netease.nimlib.sdk.team.model.Team;
 import com.netease.nimlib.sdk.uinfo.model.UserInfo;
@@ -89,16 +85,17 @@ public class HeadImageView extends CircleImageView {
          * 若使用网易云信云存储，这里可以设置下载图片的压缩尺寸，生成下载URL
          * 如果图片来源是非网易云信云存储，请不要使用NosThumbImageUtil
          */
-        final String thumbUrl = makeAvatarThumbNosUrl(url, thumbSize);
-        RequestOptions requestOptions = new RequestOptions()
-                .centerCrop()
-                .placeholder(defaultResId)
-                .error(defaultResId)
-                .override(thumbSize, thumbSize);
-        Glide.with(getContext().getApplicationContext()).asBitmap()
-                .load(thumbUrl)
-                .apply(requestOptions)
-                .into(this);
+//        final String thumbUrl = makeAvatarThumbNosUrl(url, thumbSize);
+//        RequestOptions requestOptions = new RequestOptions()
+//                .centerCrop()
+//                .placeholder(defaultResId)
+//                .error(defaultResId)
+//                .override(thumbSize, thumbSize);
+//        Glide.with(getContext().getApplicationContext()).asBitmap()
+//                .load(thumbUrl)
+//                .apply(requestOptions)
+//                .into(this);
+        ImageLoader.getInstance(getContext()).displayImage(url, this, defaultResId);
     }
 
     /**
@@ -108,18 +105,18 @@ public class HeadImageView extends CircleImageView {
         setImageBitmap(null);
     }
 
-    /**
-     * 生成头像缩略图NOS URL地址（用作ImageLoader缓存的key）
-     */
-    private static String makeAvatarThumbNosUrl(final String url, final int thumbSize) {
-        if (TextUtils.isEmpty(url)) {
-            return url;
-        }
+//    /**
+//     * 生成头像缩略图NOS URL地址（用作ImageLoader缓存的key）
+//     */
+//    private static String makeAvatarThumbNosUrl(final String url, final int thumbSize) {
+//        if (TextUtils.isEmpty(url)) {
+//            return url;
+//        }
+//
+//        return thumbSize > 0 ? NosThumbImageUtil.makeImageThumbUrl(url, NosThumbParam.ThumbType.Crop, thumbSize, thumbSize) : url;
+//    }
 
-        return thumbSize > 0 ? NosThumbImageUtil.makeImageThumbUrl(url, NosThumbParam.ThumbType.Crop, thumbSize, thumbSize) : url;
-    }
-
-    public static String getAvatarCacheKey(final String url) {
-        return makeAvatarThumbNosUrl(url, DEFAULT_AVATAR_THUMB_SIZE);
-    }
+//    public static String getAvatarCacheKey(final String url) {
+//        return makeAvatarThumbNosUrl(url, DEFAULT_AVATAR_THUMB_SIZE);
+//    }
 }

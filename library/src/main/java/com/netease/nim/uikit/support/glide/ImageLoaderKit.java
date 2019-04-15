@@ -4,14 +4,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.netease.nim.uikit.api.NimUIKit;
 import com.netease.nim.uikit.common.framework.NimSingleThreadExecutor;
 import com.netease.nim.uikit.common.ui.imageview.HeadImageView;
 import com.netease.nimlib.sdk.uinfo.model.UserInfo;
-
-import java.util.concurrent.TimeUnit;
+import com.squareup.picasso.Picasso;
 
 /**
  * 图片缓存管理组件
@@ -31,7 +28,7 @@ public class ImageLoaderKit {
      */
 
     public void clear() {
-        NIMGlideModule.clearMemoryCache(context);
+//        NIMGlideModule.clearMemoryCache(context);
     }
 
     /**
@@ -57,15 +54,16 @@ public class ImageLoaderKit {
 
         Bitmap cachedBitmap = null;
         try {
-            cachedBitmap = Glide.with(context)
-                    .asBitmap()
-                    .load(url)
-                    .apply(new RequestOptions()
-                            .centerCrop()
-                            .override(imageSize, imageSize))
-                    .submit()
-                    .get(200, TimeUnit.MILLISECONDS)// 最大等待200ms
+//            cachedBitmap = Glide.with(context)
+//                    .asBitmap()
+//                    .load(url)
+//                    .apply(new RequestOptions()
+//                            .centerCrop()
+//                            .override(imageSize, imageSize))
+//                    .submit()
+//                    .get(200, TimeUnit.MILLISECONDS)// 最大等待200ms
             ;
+            cachedBitmap = Picasso.get().load(url).centerCrop().get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -94,8 +92,9 @@ public class ImageLoaderKit {
         }
 
         final int imageSize = HeadImageView.DEFAULT_AVATAR_THUMB_SIZE;
-        Glide.with(context)
-                .load(url)
-                .submit(imageSize, imageSize);
+        Picasso.get().load(url).resize(imageSize, imageSize).fetch();
+//        Glide.with(context)
+//                .load(url)
+//                .submit(imageSize, imageSize).fetch();
     }
 }

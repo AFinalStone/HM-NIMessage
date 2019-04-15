@@ -44,31 +44,29 @@ public class ActionsPagerAdapter extends PagerAdapter {
 
         GridView gridView = new GridView(context);
         gridView.setAdapter(new ActionsGridviewAdapter(context, subBaseActions));
-        if (actions.size() >= 4) {
-            gridView.setNumColumns(4);
-
-            container.post(new Runnable() {
-                @Override
-                public void run() {
-                    ViewGroup.LayoutParams layoutParams = viewPager.getLayoutParams();
-                    layoutParams.height = context.getResources().getDimensionPixelOffset(
-                            R.dimen.message_bottom_function_viewpager_height);
-                    viewPager.setLayoutParams(layoutParams);
-                }
-            });
-        } else {
-            gridView.setNumColumns(actions.size());
-
-            container.post(new Runnable() {
-                @Override
-                public void run() {
-                    ViewGroup.LayoutParams layoutParams = viewPager.getLayoutParams();
-                    layoutParams.height = context.getResources().getDimensionPixelOffset(
-                            R.dimen.message_bottom_function_viewpager_height) / 2;
-                    viewPager.setLayoutParams(layoutParams);
-                }
-            });
-        }
+//        if (actions.size() >= 4) {
+        gridView.setNumColumns(4);
+        container.post(new Runnable() {
+            @Override
+            public void run() {
+                ViewGroup.LayoutParams layoutParams = viewPager.getLayoutParams();
+                layoutParams.height = context.getResources().getDimensionPixelOffset(
+                        R.dimen.message_bottom_function_viewpager_height);
+                viewPager.setLayoutParams(layoutParams);
+            }
+        });
+//        } else {
+//            gridView.setNumColumns(actions.size());
+//            container.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    ViewGroup.LayoutParams layoutParams = viewPager.getLayoutParams();
+//                    layoutParams.height = context.getResources().getDimensionPixelOffset(
+//                            R.dimen.message_bottom_function_viewpager_height) / 2;
+//                    viewPager.setLayoutParams(layoutParams);
+//                }
+//            });
+//        }
         gridView.setSelector(R.color.transparent);
         gridView.setHorizontalSpacing(0);
         gridView.setVerticalSpacing(0);

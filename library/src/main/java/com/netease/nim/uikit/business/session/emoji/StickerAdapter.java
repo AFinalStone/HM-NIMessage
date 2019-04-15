@@ -7,9 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
+import com.hm.iou.tools.ImageLoader;
 import com.netease.nim.uikit.R;
 
 /**
@@ -66,14 +64,14 @@ public class StickerAdapter extends BaseAdapter {
             return convertView;
         }
 
-        Glide.with(context)
-                .load(StickerManager.getInstance().getStickerUri(sticker.getCategory(), sticker.getName()))
-                .apply(new RequestOptions()
-                        .error(com.netease.nim.uikit.R.drawable.nim_default_img_failed)
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .dontAnimate())
-                .into(viewHolder.imageView);
-
+//        Glide.with(context)
+//                .load(StickerManager.getInstance().getStickerUri(sticker.getCategory(), sticker.getName()))
+//                .apply(new RequestOptions()
+//                        .error(com.netease.nim.uikit.R.drawable.nim_default_img_failed)
+//                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                        .dontAnimate())
+//                .into(viewHolder.imageView);
+        ImageLoader.getInstance(context).displayImage(StickerManager.getInstance().getStickerUri(sticker.getCategory(), sticker.getName()), viewHolder.imageView);
         viewHolder.descLabel.setVisibility(View.GONE);
 
         return convertView;
