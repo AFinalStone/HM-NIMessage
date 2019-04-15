@@ -2,12 +2,16 @@ package com.netease.nim.uikit.business.session.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.hm.iou.uikit.HMTopBarView;
+import com.hm.iou.base.utils.StatusBarUtil;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.NimUIKit;
 import com.netease.nim.uikit.api.model.contact.ContactChangedObserver;
@@ -37,7 +41,7 @@ import java.util.Set;
 public class P2PMessageActivity extends BaseMessageActivity {
 
     private boolean isResume = false;
-    private HMTopBarView mTopBar;
+    private TextView mTvTitle;
 
     public static void start(Context context, String contactId, SessionCustomization customization, IMMessage anchor) {
         Intent intent = new Intent();
@@ -55,7 +59,18 @@ public class P2PMessageActivity extends BaseMessageActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (StatusBarUtil.setMeiZuStatusBarDarkFont(true, getWindow())) {
+                return;
+            }
+            if (StatusBarUtil.setXiaoMiStatusBarDarkFont(true, this)) {
 
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                getWindow().setStatusBarColor(getColor(R.color.white));
+            }
+        }
         // 单聊特例话数据，包括个人信息，
         requestBuddyInfo();
         displayOnlineState();
@@ -83,9 +98,8 @@ public class P2PMessageActivity extends BaseMessageActivity {
     }
 
     private void requestBuddyInfo() {
-        String titleName = UserInfoHelper.getUserTitleName(sessionId, SessionTypeEnum.P2P);
-        if (mTopBar != null) {
-            mTopBar.setTitle(titleName);
+        if (mTvTitle != null) {
+            mTvTitle.setText(UserInfoHelper.getUserTitleName(sessionId, SessionTypeEnum.P2P));
         }
     }
 
@@ -220,8 +234,15 @@ public class P2PMessageActivity extends BaseMessageActivity {
 
     @Override
     protected void initToolBar() {
-        mTopBar = findView(R.id.topBar);
-//        ToolBarOptions options = new NimToolBarOptions();
-//        setToolBar(R.id.toolbar, options);
+        Toolbar toolbar = findView(R.id.toolbar);
+        mTvTitle = findView(R.id.tv_title);
+        findView(R.id.iv_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 }

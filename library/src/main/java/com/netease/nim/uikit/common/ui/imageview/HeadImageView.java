@@ -1,16 +1,19 @@
 package com.netease.nim.uikit.common.ui.imageview;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 
-import com.hm.iou.tools.ImageLoader;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.NimUIKit;
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
+import com.netease.nimlib.sdk.nos.model.NosThumbParam;
+import com.netease.nimlib.sdk.nos.util.NosThumbImageUtil;
 import com.netease.nimlib.sdk.robot.model.RobotAttachment;
 import com.netease.nimlib.sdk.team.model.Team;
 import com.netease.nimlib.sdk.uinfo.model.UserInfo;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by huangjun on 2015/11/13.
@@ -80,12 +83,12 @@ public class HeadImageView extends CircleImageView {
     /**
      * ImageLoader异步加载
      */
-    private void doLoadImage(final String url, final int defaultResId, final int thumbSize) {
+    private void doLoadImage(String url, int defaultResId, int thumbSize) {
         /*
          * 若使用网易云信云存储，这里可以设置下载图片的压缩尺寸，生成下载URL
          * 如果图片来源是非网易云信云存储，请不要使用NosThumbImageUtil
          */
-//        final String thumbUrl = makeAvatarThumbNosUrl(url, thumbSize);
+//        String thumbUrl = makeAvatarThumbNosUrl(url, thumbSize);
 //        RequestOptions requestOptions = new RequestOptions()
 //                .centerCrop()
 //                .placeholder(defaultResId)
@@ -95,7 +98,20 @@ public class HeadImageView extends CircleImageView {
 //                .load(thumbUrl)
 //                .apply(requestOptions)
 //                .into(this);
-        ImageLoader.getInstance(getContext()).displayImage(url, this, defaultResId);
+        if (TextUtils.isEmpty(url)) {
+            Picasso.get().load(R.drawable.nim_avatar_default)
+                    .centerCrop()
+                    .resize(thumbSize, thumbSize)
+                    .placeholder(defaultResId)
+                    .error(defaultResId).into(this);
+        } else {
+            Picasso.get().load(url)
+                    .centerCrop()
+                    .resize(thumbSize, thumbSize)
+                    .placeholder(defaultResId)
+                    .error(defaultResId)
+                    .into(this);
+        }
     }
 
     /**
@@ -115,7 +131,7 @@ public class HeadImageView extends CircleImageView {
 //
 //        return thumbSize > 0 ? NosThumbImageUtil.makeImageThumbUrl(url, NosThumbParam.ThumbType.Crop, thumbSize, thumbSize) : url;
 //    }
-
+//
 //    public static String getAvatarCacheKey(final String url) {
 //        return makeAvatarThumbNosUrl(url, DEFAULT_AVATAR_THUMB_SIZE);
 //    }

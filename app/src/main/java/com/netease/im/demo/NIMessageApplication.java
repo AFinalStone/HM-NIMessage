@@ -53,7 +53,6 @@ public class NIMessageApplication extends Application {
         String packageName = getPackageName();
         String processName = getProcessName();
         if (packageName.equals(processName)) {
-
             // 初始化UIKit模块
             initUIKit();
         }
@@ -115,7 +114,7 @@ public class NIMessageApplication extends Application {
         config.ledOnMs = 1000;
         config.ledOffMs = 1500;
         // 通知铃声的uri字符串
-        config.notificationSound = "android.resource://com.netease.nim.demo/raw/msg";
+        config.notificationSound = "android.resource://" + getPackageName() + "/raw/msg";
         options.statusBarNotificationConfig = config;
 
         // 配置保存图片，文件，log 等数据的目录
