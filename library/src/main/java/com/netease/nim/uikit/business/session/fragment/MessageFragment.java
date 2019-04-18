@@ -17,6 +17,7 @@ import com.netease.nim.uikit.business.session.actions.AddPictureAction;
 import com.netease.nim.uikit.business.session.actions.BaseAction;
 import com.netease.nim.uikit.business.session.actions.CreateBorrowReceiptAction;
 import com.netease.nim.uikit.business.session.actions.CreateReceiveReceiptAction;
+import com.netease.nim.uikit.business.session.actions.ImageAction;
 import com.netease.nim.uikit.business.session.constant.Extras;
 import com.netease.nim.uikit.business.session.module.Container;
 import com.netease.nim.uikit.business.session.module.ModuleProxy;
