@@ -1,5 +1,6 @@
 package com.netease.nim.uikit.business.chatroom.module;
 
+import android.app.Activity;
 import android.view.View;
 
 import com.netease.nim.uikit.business.session.actions.BaseAction;
@@ -15,12 +16,13 @@ import java.util.List;
  */
 public class ChatRoomInputPanel extends InputPanel {
 
-    public ChatRoomInputPanel(Container container, View view, List<BaseAction> actions, boolean isTextAudioSwitchShow) {
-        super(container, view, actions, isTextAudioSwitchShow);
+
+    public ChatRoomInputPanel(Activity activity, Container container, View view, List<BaseAction> actions, boolean isTextAudioSwitchShow) {
+        super(activity, container, view, actions, isTextAudioSwitchShow);
     }
 
-    public ChatRoomInputPanel(Container container, View view, List<BaseAction> actions) {
-        super(container, view, actions);
+    public ChatRoomInputPanel(Activity activity, Container container, View view, List<BaseAction> actions) {
+        super(activity, container, view, actions);
     }
 
     @Override

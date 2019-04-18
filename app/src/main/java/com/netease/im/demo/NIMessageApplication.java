@@ -91,6 +91,7 @@ public class NIMessageApplication extends Application {
         // 如果 options 中没有设置这个值，SDK 会使用采用默认路径作为 SDK 的数据目录。
         // 该目录目前包含 log, file, image, audio, video, thumb 这6个目录。
         String sdkPath = FileUtil.getExternalCacheDirPath(this) + "/nim"; // 可以不设置，那么将采用默认路径
+//        /storage/emulated/0/Android/data/com.netease.im.demo/cache/nim
         // 如果第三方 APP 需要缓存清理功能， 清理这个目录下面个子目录的内容即可。
         options.sdkStorageRootPath = sdkPath;
 

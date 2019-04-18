@@ -141,7 +141,7 @@ public class ChatRoomMessageFragment extends TFragment implements ModuleProxy {
         }
 
         if (inputPanel == null) {
-            inputPanel = new ChatRoomInputPanel(container, rootView, getActionList(), false);
+            inputPanel = new ChatRoomInputPanel(getActivity(), container, rootView, getActionList(), false);
         } else {
             inputPanel.reload(container, null);
         }

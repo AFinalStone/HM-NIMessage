@@ -1,5 +1,6 @@
 package com.netease.nim.uikit.business.session.module.input;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
+import com.hm.iou.base.utils.PermissionUtil;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.NimUIKit;
 import com.netease.nim.uikit.api.UIKitOptions;
@@ -50,9 +52,12 @@ import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.msg.model.CustomNotification;
 import com.netease.nimlib.sdk.msg.model.CustomNotificationConfig;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.File;
 import java.util.List;
+
+import io.reactivex.functions.Consumer;
 
 /**
  * 底部文本编辑，语音等模块
@@ -109,8 +114,10 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
     private boolean isRobotSession;
 
     private TextWatcher aitTextWatcher;
+    private Activity mActivity;
 
-    public InputPanel(Container container, View view, List<BaseAction> actions, boolean isTextAudioSwitchShow) {
+    public InputPanel(Activity activity, Container container, View view, List<BaseAction> actions, boolean isTextAudioSwitchShow) {
+        this.mActivity = activity;
         this.container = container;
         this.view = view;
         this.actions = actions;
@@ -119,8 +126,8 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
         init();
     }
 
-    public InputPanel(Container container, View view, List<BaseAction> actions) {
-        this(container, view, actions, true);
+    public InputPanel(Activity activity, Container container, View view, List<BaseAction> actions) {
+        this(activity, container, view, actions, true);
     }
 
     public void onPause() {
@@ -621,9 +628,11 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    touched = true;
-                    initAudioRecord();
-                    onStartAudioRecord();
+                    if (requestPermission()) {
+                        touched = true;
+                        initAudioRecord();
+                        onStartAudioRecord();
+                    }
                 } else if (event.getAction() == MotionEvent.ACTION_CANCEL
                         || event.getAction() == MotionEvent.ACTION_UP) {
                     touched = false;
@@ -636,6 +645,47 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
                 return false;
             }
         });
+    }
+
+
+    private boolean requestPermission() {
+        boolean p1 = PermissionUtil.isPermissionGranted(mActivity, Manifest.permission.RECORD_AUDIO);
+        boolean p2 = PermissionUtil.isPermissionGranted(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (p1 & p2) {
+            return true;
+        }
+        PermissionUtil.showPermissionRemindDialog(mActivity, "开启麦克风和读写手机存储权限", "我们需要获得该权限，才能为您提供录制语音的功能。", new PermissionUtil.OnPermissionDialogClick() {
+            @Override
+            public void onPositiveBtnClick() {
+                RxPermissions rxPermissions = new RxPermissions(mActivity);
+                rxPermissions
+                        .request(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .subscribe(new Consumer<Boolean>() {
+                            @Override
+                            public void accept(Boolean aBoolean) throws Exception {
+                                if (!aBoolean) {
+                                    PermissionUtil.showPermissionReqDialog(mActivity, "我们需要获得麦克风和读写手机存储权限，才能为您提供录制语音的功能。", new PermissionUtil.OnPermissionDialogClick() {
+                                        @Override
+                                        public void onPositiveBtnClick() {
+
+                                        }
+
+                                        @Override
+                                        public void onNegativeBtnClick() {
+
+                                        }
+                                    });
+                                }
+                            }
+                        });
+            }
+
+            @Override
+            public void onNegativeBtnClick() {
+
+            }
+        });
+        return false;
     }
 
     // 上滑取消录音判断
@@ -665,10 +715,12 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
      * 开始语音录制
      */
     private void onStartAudioRecord() {
-        container.activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        audioMessageHelper.startRecord();
-        cancelled = false;
+        if (audioMessageHelper != null) {
+            container.activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            audioMessageHelper.startRecord();
+            cancelled = false;
+        }
     }
 
     /**
@@ -677,13 +729,15 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
      * @param cancel
      */
     private void onEndAudioRecord(boolean cancel) {
-        started = false;
-        container.activity.getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if (audioMessageHelper != null) {
+            started = false;
+            container.activity.getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        audioMessageHelper.completeRecord(cancel);
-        audioRecordBtn.setText(R.string.record_audio);
-        audioRecordBtn.setBackgroundResource(R.drawable.nim_message_input_edittext_box);
-        stopAudioRecordAnim();
+            audioMessageHelper.completeRecord(cancel);
+            audioRecordBtn.setText(R.string.record_audio);
+            audioRecordBtn.setBackgroundResource(R.drawable.nim_message_input_edittext_box);
+            stopAudioRecordAnim();
+        }
     }
 
     /**

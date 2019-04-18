@@ -45,6 +45,7 @@
 
         <Button
             android:id="@+id/audioRecord"
+            style="@style/UikitHMButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/nim_message_input_edittext_box"
