@@ -78,7 +78,7 @@ public class ChatRoomMsgListPanel {
     }
 
     public void onPause() {
-        MessageAudioControl.getInstance(container.activity).stopAudio();
+        MessageAudioControl.getInstance().stopAudio();
     }
 
     public void onDestroy() {
@@ -87,7 +87,7 @@ public class ChatRoomMsgListPanel {
 
     public boolean onBackPressed() {
         uiHandler.removeCallbacks(null);
-        MessageAudioControl.getInstance(container.activity).stopAudio(); // 界面返回，停止语音播放
+        MessageAudioControl.getInstance().stopAudio(); // 界面返回，停止语音播放
         return false;
     }
 
@@ -472,7 +472,7 @@ public class ChatRoomMsgListPanel {
         if (update) {
             UserPreferences.setEarPhoneModeEnable(earPhoneMode);
         }
-        MessageAudioControl.getInstance(container.activity).setEarPhoneModeEnable(earPhoneMode);
+        MessageAudioControl.getInstance().setEarPhoneModeEnable(earPhoneMode);
     }
 
     public void scrollToBottom() {
