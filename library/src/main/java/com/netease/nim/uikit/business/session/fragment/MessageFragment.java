@@ -266,7 +266,7 @@ public class MessageFragment extends TFragment implements ModuleProxy {
     private void sendFailWithBlackList(int code, IMMessage msg) {
         if (code == ResponseCode.RES_IN_BLACK_LIST) {
             // 如果被对方拉入黑名单，发送的消息前不显示重发红点
-            msg.setStatus(MsgStatusEnum.fail);
+            msg.setStatus(MsgStatusEnum.success);
             NIMClient.getService(MsgService.class).updateIMMessageStatus(msg);
             messageListPanel.refreshMessageList();
             // 同时，本地插入被对方拒收的tip消息
