@@ -3,11 +3,15 @@ package com.netease.nim.uikit.business.session.fragment;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.netease.nim.uikit.NIMClientHelper;
+import com.netease.nim.uikit.LocalExtensionMsgTipEnum;
+import com.netease.nim.uikit.NIMConstant;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.UIKitOptions;
 import com.netease.nim.uikit.api.model.main.CustomPushContentProvider;
@@ -17,17 +21,16 @@ import com.netease.nim.uikit.business.session.actions.AddPictureAction;
 import com.netease.nim.uikit.business.session.actions.BaseAction;
 import com.netease.nim.uikit.business.session.actions.CreateBorrowReceiptAction;
 import com.netease.nim.uikit.business.session.actions.CreateReceiveReceiptAction;
-import com.netease.nim.uikit.business.session.actions.ImageAction;
 import com.netease.nim.uikit.business.session.constant.Extras;
 import com.netease.nim.uikit.business.session.module.Container;
 import com.netease.nim.uikit.business.session.module.ModuleProxy;
 import com.netease.nim.uikit.business.session.module.input.InputPanel;
 import com.netease.nim.uikit.business.session.module.list.MessageListPanelEx;
 import com.netease.nim.uikit.common.fragment.TFragment;
+import com.netease.nim.uikit.event.SendMsgFailedEvent;
 import com.netease.nim.uikit.impl.NimUIKitImpl;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.Observer;
-import com.netease.nimlib.sdk.RequestCallback;
 import com.netease.nimlib.sdk.ResponseCode;
 import com.netease.nimlib.sdk.msg.MessageBuilder;
 import com.netease.nimlib.sdk.msg.MsgService;
@@ -43,7 +46,12 @@ import com.netease.nimlib.sdk.robot.model.NimRobotInfo;
 import com.netease.nimlib.sdk.robot.model.RobotAttachment;
 import com.netease.nimlib.sdk.robot.model.RobotMsgType;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,6 +89,18 @@ public class MessageFragment extends TFragment implements ModuleProxy {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.nim_message_fragment, container, false);
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
     }
 
     /**
@@ -235,24 +255,8 @@ public class MessageFragment extends TFragment implements ModuleProxy {
             final IMMessage msg = message;
             appendPushConfig(message);
             // send message to server and save to db
-            NIMClient.getService(MsgService.class).sendMessage(message, false).setCallback(new RequestCallback<Void>() {
-                @Override
-                public void onSuccess(Void param) {
-
-                }
-
-                @Override
-                public void onFailed(int code) {
-                    sendFailWithBlackList(code, msg);
-                }
-
-                @Override
-                public void onException(Throwable exception) {
-
-                }
-            });
+            NIMClientHelper.sendMsg(message, false);
         }
-
 
         messageListPanel.onMsgSend(message);
 
@@ -263,21 +267,47 @@ public class MessageFragment extends TFragment implements ModuleProxy {
     }
 
     // 被对方拉入黑名单后，发消息失败的交互处理
-    private void sendFailWithBlackList(int code, IMMessage msg) {
-        if (code == ResponseCode.RES_IN_BLACK_LIST) {
-            // 如果被对方拉入黑名单，发送的消息前不显示重发红点
-            msg.setStatus(MsgStatusEnum.success);
-            NIMClient.getService(MsgService.class).updateIMMessageStatus(msg);
-            messageListPanel.refreshMessageList();
-            // 同时，本地插入被对方拒收的tip消息
-            IMMessage tip = MessageBuilder.createTipMessage(msg.getSessionId(), msg.getSessionType());
-            tip.setContent(getActivity().getString(R.string.black_list_send_tip));
-            tip.setStatus(MsgStatusEnum.success);
-            CustomMessageConfig config = new CustomMessageConfig();
-            config.enableUnreadCount = false;
-            tip.setConfig(config);
-            NIMClient.getService(MsgService.class).saveMessageToLocal(tip, true);
-        }
+    private void sendFailWithBlackList(IMMessage msg) {
+        // 如果被对方拉入黑名单，发送的消息前不显示重发红点
+        msg.setStatus(MsgStatusEnum.success);
+        NIMClient.getService(MsgService.class).updateIMMessageStatus(msg);
+        messageListPanel.refreshMessageList();
+        // 同时，本地插入被对方拒收的tip消息
+        IMMessage tip = MessageBuilder.createTipMessage(msg.getSessionId(), msg.getSessionType());
+        tip.setContent(getActivity().getString(R.string.black_list_send_tip));
+        tip.setStatus(MsgStatusEnum.success);
+        CustomMessageConfig config = new CustomMessageConfig();
+        config.enableUnreadCount = false;
+        tip.setConfig(config);
+        //自定义本地tip消息
+        HashMap<String, Object> tipMap = new HashMap<>();
+        tipMap.put(NIMConstant.CUSTOM_MSG_TIP, LocalExtensionMsgTipEnum.is_no_friend.getType());
+        tip.setLocalExtension(tipMap);
+        NIMClient.getService(MsgService.class).saveMessageToLocal(tip, true);
+    }    // 被对方拉入黑名单后，发消息失败的交互处理
+
+    /**
+     * 两个人还不是好友关系
+     *
+     * @param msg
+     */
+    private void sendFailWithIsNoFriend(IMMessage msg) {
+        // 如果被对方拉入黑名单，发送的消息前不显示重发红点
+        msg.setStatus(MsgStatusEnum.fail);
+        NIMClient.getService(MsgService.class).updateIMMessageStatus(msg);
+        messageListPanel.refreshMessageList();
+        // 同时，本地插入两个人还不是好友的tip消息
+        IMMessage tip = MessageBuilder.createTipMessage(msg.getSessionId(), msg.getSessionType());
+        tip.setContent(getActivity().getString(R.string.no_friend_send_tip));
+        tip.setStatus(MsgStatusEnum.success);
+        CustomMessageConfig config = new CustomMessageConfig();
+        config.enableUnreadCount = false;
+        tip.setConfig(config);
+        //自定义本地tip消息
+        HashMap<String, Object> tipMap = new HashMap<>();
+        tipMap.put(NIMConstant.CUSTOM_MSG_TIP, LocalExtensionMsgTipEnum.is_no_friend.getType());
+        tip.setLocalExtension(tipMap);
+        NIMClient.getService(MsgService.class).saveMessageToLocal(tip, true);
     }
 
     private void appendTeamMemberPush(IMMessage message) {
@@ -403,5 +433,14 @@ public class MessageFragment extends TFragment implements ModuleProxy {
      */
     public void receiveReceipt() {
         messageListPanel.receiveReceipt();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvenRedFlagCount(SendMsgFailedEvent sendMsgFailedEvent) {
+        if (NIMConstant.RES_IS_NO_FRIEND == sendMsgFailedEvent.getFailedCode()) {
+            sendFailWithIsNoFriend(sendMsgFailedEvent.getMessage());//非好友
+        } else if (ResponseCode.RES_IN_BLACK_LIST == sendMsgFailedEvent.getFailedCode()) {
+            sendFailWithBlackList(sendMsgFailedEvent.getMessage());//黑名单
+        }
     }
 }

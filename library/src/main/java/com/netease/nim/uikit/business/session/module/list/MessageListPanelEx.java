@@ -14,6 +14,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.netease.nim.uikit.LocalExtensionMsgTipEnum;
+import com.netease.nim.uikit.NIMClientHelper;
+import com.netease.nim.uikit.NIMConstant;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.NimUIKit;
 import com.netease.nim.uikit.api.model.user.UserInfoObserver;
@@ -69,6 +72,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 基于RecyclerView的消息收发模块
@@ -793,11 +797,22 @@ public class MessageListPanelEx {
             if (index >= 0 && index < items.size()) {
                 IMMessage item = items.get(index);
                 item.setStatus(MsgStatusEnum.sending);
+                //删除下方的提示文案
+                if (index + 1 < items.size()) {
+                    IMMessage itemTip = items.get(index + 1);
+                    Map<String, Object> tipMsp = itemTip.getLocalExtension();
+                    if (tipMsp != null) {
+                        Integer type = (Integer) tipMsp.get(NIMConstant.CUSTOM_MSG_TIP);
+                        if (LocalExtensionMsgTipEnum.is_no_friend.getType() == type ||
+                                LocalExtensionMsgTipEnum.is_no_friend.getType() == type) {
+                            deleteItem(itemTip, true);
+                        }
+                    }
+                }
                 deleteItem(item, true);
                 onMsgSend(item);
             }
-
-            NIMClient.getService(MsgService.class).sendMessage(message, true);
+            NIMClientHelper.sendMsg(message, true);
         }
 
         /**
