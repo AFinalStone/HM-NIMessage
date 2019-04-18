@@ -59,4 +59,6 @@ dependencies {
     api 'com.netease.nimlib:chatroom:6.2.0'
     api 'com.netease.nimlib:lucene:6.2.0'
     implementation project(':library')
+    //图片选择
+    compile 'com.heima.iou:hmselectpiclocal:1.0.0'
 }

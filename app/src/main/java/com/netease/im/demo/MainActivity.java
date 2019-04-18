@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_chat_with_another).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                NimUIKit.startP2PSession(MainActivity.this, "1000294");//方超
-                NimUIKit.startP2PSession(MainActivity.this, "1000393");//石磊            }
+                NimUIKit.startP2PSession(MainActivity.this, "d1000294");//方超
+//                NimUIKit.startP2PSession(MainActivity.this, "d1000393");//石磊            }
             }
         });
         RxPermissions rxPermissions = new RxPermissions(this);
@@ -45,10 +45,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void login() {
-//        String account = "1000393";//石磊
-//        String token = "3ee5b627b483df7dad89ca1eeb5371bc";
-        String account = "1000294";//方超
-        String token = "5a5c5dd3f195bb0bf05e0de00b2237f6";
+        String account = "d1000393";//石磊
+        String token = "f364b669f177962a1a1717b38fad4ecb";
+//        String account = "d1000294";//方超
+//        String token = "5a5c5dd3f195bb0bf05e0de00b2237f6";
         LoginInfo loginInfo = new LoginInfo(account, token);
         RequestCallback requestCallback = new RequestCallback() {
             @Override

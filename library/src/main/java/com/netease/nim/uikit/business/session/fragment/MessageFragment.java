@@ -13,10 +13,10 @@ import com.netease.nim.uikit.api.UIKitOptions;
 import com.netease.nim.uikit.api.model.main.CustomPushContentProvider;
 import com.netease.nim.uikit.api.model.session.SessionCustomization;
 import com.netease.nim.uikit.business.ait.AitManager;
+import com.netease.nim.uikit.business.session.actions.AddPictureAction;
 import com.netease.nim.uikit.business.session.actions.BaseAction;
-import com.netease.nim.uikit.business.session.actions.ImageAction;
-import com.netease.nim.uikit.business.session.actions.LocationAction;
-import com.netease.nim.uikit.business.session.actions.VideoAction;
+import com.netease.nim.uikit.business.session.actions.CreateBorrowReceiptAction;
+import com.netease.nim.uikit.business.session.actions.CreateReceiveReceiptAction;
 import com.netease.nim.uikit.business.session.constant.Extras;
 import com.netease.nim.uikit.business.session.module.Container;
 import com.netease.nim.uikit.business.session.module.ModuleProxy;
@@ -228,7 +228,7 @@ public class MessageFragment extends TFragment implements ModuleProxy {
             message.setContent("该消息无法发送");
             message.setStatus(MsgStatusEnum.success);
             NIMClient.getService(MsgService.class).saveMessageToLocal(message, false);
-        }else {
+        } else {
             appendTeamMemberPush(message);
             message = changeToRobotMsg(message);
             final IMMessage msg = message;
@@ -253,7 +253,6 @@ public class MessageFragment extends TFragment implements ModuleProxy {
         }
 
 
-
         messageListPanel.onMsgSend(message);
 
         if (aitManager != null) {
@@ -266,7 +265,7 @@ public class MessageFragment extends TFragment implements ModuleProxy {
     private void sendFailWithBlackList(int code, IMMessage msg) {
         if (code == ResponseCode.RES_IN_BLACK_LIST) {
             // 如果被对方拉入黑名单，发送的消息前不显示重发红点
-            msg.setStatus(MsgStatusEnum.success);
+            msg.setStatus(MsgStatusEnum.fail);
             NIMClient.getService(MsgService.class).updateIMMessageStatus(msg);
             messageListPanel.refreshMessageList();
             // 同时，本地插入被对方拒收的tip消息
@@ -332,7 +331,7 @@ public class MessageFragment extends TFragment implements ModuleProxy {
         if (customConfig != null) {
             String content = customConfig.getPushContent(message);
             Map<String, Object> payload = customConfig.getPushPayload(message);
-            if(!TextUtils.isEmpty(content)){
+            if (!TextUtils.isEmpty(content)) {
                 message.setPushContent(content);
             }
             if (payload != null) {
@@ -381,10 +380,9 @@ public class MessageFragment extends TFragment implements ModuleProxy {
     // 操作面板集合
     protected List<BaseAction> getActionList() {
         List<BaseAction> actions = new ArrayList<>();
-        actions.add(new ImageAction());
-        actions.add(new VideoAction());
-        //TODO
-//        actions.add(new LocationAction());
+        actions.add(new AddPictureAction());
+        actions.add(new CreateReceiveReceiptAction());
+        actions.add(new CreateBorrowReceiptAction());
 
         if (customization != null && customization.actions != null) {
             actions.addAll(customization.actions);
