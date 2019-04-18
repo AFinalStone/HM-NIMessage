@@ -173,8 +173,8 @@ public final class NimUIKitImpl {
         NimUIKitImpl.context = context.getApplicationContext();
         NimUIKitImpl.options = options;
         // init tools
-        StorageUtil.init(context, options.appCacheDir);
-        ScreenUtil.init(context);
+        StorageUtil.init(context.getApplicationContext(), options.appCacheDir);
+        ScreenUtil.init(context.getApplicationContext());
 
         if (options.loadSticker) {
             StickerManager.getInstance().init();
@@ -562,7 +562,7 @@ public final class NimUIKitImpl {
 
 
     public static void setEarPhoneModeEnable(boolean enable) {
-        MessageAudioControl.getInstance(context).setEarPhoneModeEnable(enable);
+        MessageAudioControl.getInstance().setEarPhoneModeEnable(enable);
         UserPreferences.setEarPhoneModeEnable(enable);
     }
 

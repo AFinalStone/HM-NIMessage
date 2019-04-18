@@ -125,7 +125,7 @@ public class MessageListPanelEx {
     }
 
     public void onPause() {
-        MessageAudioControl.getInstance(container.activity).stopAudio();
+        MessageAudioControl.getInstance().stopAudio();
     }
 
     public void onDestroy() {
@@ -134,7 +134,7 @@ public class MessageListPanelEx {
 
     public boolean onBackPressed() {
         uiHandler.removeCallbacks(null);
-        MessageAudioControl.getInstance(container.activity).stopAudio(); // 界面返回，停止语音播放
+        MessageAudioControl.getInstance().stopAudio(); // 界面返回，停止语音播放
         if (voiceTrans != null && voiceTrans.isShow()) {
             voiceTrans.hide();
             return true;
@@ -828,7 +828,7 @@ public class MessageListPanelEx {
         private void prepareDialogItems(final IMMessage selectedItem, CustomAlertDialog alertDialog) {
             MsgTypeEnum msgType = selectedItem.getMsgType();
 
-            MessageAudioControl.getInstance(container.activity).stopAudio();
+            MessageAudioControl.getInstance().stopAudio();
 
             // 0 EarPhoneMode-----语音是通过扬声器还是耳机进行播放
             longClickItemEarPhoneMode(alertDialog, msgType);
@@ -1061,7 +1061,7 @@ public class MessageListPanelEx {
         if (update) {
             UserPreferences.setEarPhoneModeEnable(earPhoneMode);
         }
-        MessageAudioControl.getInstance(container.activity).setEarPhoneModeEnable(earPhoneMode);
+        MessageAudioControl.getInstance().setEarPhoneModeEnable(earPhoneMode);
     }
 
     private Bitmap getBackground(String path) {

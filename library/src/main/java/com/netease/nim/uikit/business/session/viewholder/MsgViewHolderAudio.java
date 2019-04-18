@@ -54,7 +54,7 @@ public class MsgViewHolderAudio extends MsgViewHolderBase {
         unreadIndicator = findViewById(R.id.message_item_audio_unread_indicator);
         animationView = findViewById(R.id.message_item_audio_playing_animation);
         animationView.setBackgroundResource(0);
-        audioControl = MessageAudioControl.getInstance(context);
+        audioControl = MessageAudioControl.getInstance();
     }
 
     @Override

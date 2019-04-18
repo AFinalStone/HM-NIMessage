@@ -35,7 +35,7 @@ public class MessageAudioControl extends BaseAudioControl<IMMessage> {
         super(context, true);
     }
 
-    public static MessageAudioControl getInstance(Context context) {
+    public static MessageAudioControl getInstance() {
         if (mMessageAudioControl == null) {
             synchronized (MessageAudioControl.class) {
                 if (mMessageAudioControl == null) {
