@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import com.hm.iou.tools.ImageLoader;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.common.ui.imageview.MsgThumbImageView;
 import com.netease.nim.uikit.common.ui.recyclerview.adapter.BaseMultiItemFetchLoadAdapter;
@@ -46,12 +47,18 @@ public abstract class MsgViewHolderThumbBase extends MsgViewHolderBase {
         FileAttachment msgAttachment = (FileAttachment) message.getAttachment();
         String path = msgAttachment.getPath();
         String thumbPath = msgAttachment.getThumbPath();
+        thumbnail.setBlendDrawable(maskBg());
         if (!TextUtils.isEmpty(thumbPath)) {
-            loadThumbnailImage(thumbPath, false, msgAttachment.getExtension());
+            setImageSize(thumbPath);
+            thumbPath = "file://" + thumbPath;
+            ImageLoader.getInstance(context).displayImage(thumbPath, thumbnail, R.drawable.uikit_bg_pic_loading_place, R.drawable.nim_image_default);
         } else if (!TextUtils.isEmpty(path)) {
-            loadThumbnailImage(thumbFromSourceFile(path), true, msgAttachment.getExtension());
+            setImageSize(path);
+            path = "file://" + path;
+            ImageLoader.getInstance(context).displayImage(path, thumbnail, R.drawable.uikit_bg_pic_loading_place, R.drawable.nim_image_default);
         } else {
-            loadThumbnailImage(null, false, msgAttachment.getExtension());
+            setImageSize(null);
+            ImageLoader.getInstance(context).displayImage(R.drawable.nim_image_default, thumbnail);
             if (message.getAttachStatus() == AttachStatusEnum.transferred
                     || message.getAttachStatus() == AttachStatusEnum.def) {
                 downloadAttachment();
@@ -84,15 +91,15 @@ public abstract class MsgViewHolderThumbBase extends MsgViewHolderBase {
         }
     }
 
-    private void loadThumbnailImage(String path, boolean isOriginal, String ext) {
-        setImageSize(path);
-        if (path != null) {
-            //thumbnail.loadAsPath(thumbPath, getImageMaxEdge(), getImageMaxEdge(), maskBg());
-            thumbnail.loadAsPath(path, getImageMaxEdge(), getImageMaxEdge(), maskBg(), ext);
-        } else {
-            thumbnail.loadAsResource(R.drawable.nim_image_default, maskBg());
-        }
-    }
+//    private void loadThumbnailImage(String path, boolean isOriginal, String ext) {
+//        setImageSize(path);
+//        if (path != null) {
+//            //thumbnail.loadAsPath(thumbPath, getImageMaxEdge(), getImageMaxEdge(), maskBg());
+//            thumbnail.loadAsPath(path, getImageMaxEdge(), getImageMaxEdge(), maskBg(), ext);
+//        } else {
+//            thumbnail.loadAsResource(R.drawable.nim_image_default, maskBg());
+//        }
+//    }
 
     private void setImageSize(String thumbPath) {
         int[] bounds = null;

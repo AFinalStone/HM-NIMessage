@@ -95,9 +95,9 @@ public abstract class ChatRoomMsgViewHolderThumbBase extends ChatRoomMsgViewHold
         setImageSize(path);
         if (path != null) {
             //thumbnail.loadAsPath(thumbPath, getImageMaxEdge(), getImageMaxEdge(), maskBg());
-            thumbnail.loadAsPath(path, getImageMaxEdge(), getImageMaxEdge(), maskBg(), ext);
+//            thumbnail.loadAsPath(path, getImageMaxEdge(), getImageMaxEdge(), maskBg(), ext);
         } else {
-            thumbnail.loadAsResource(R.drawable.nim_image_default, maskBg());
+//            thumbnail.loadAsResource(R.drawable.nim_image_default, maskBg());
         }
     }
 
