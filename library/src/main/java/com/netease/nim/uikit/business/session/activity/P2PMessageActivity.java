@@ -111,7 +111,7 @@ public class P2PMessageActivity extends BaseMessageActivity {
         } else {
             unregisterUserInfoObserver();
         }
-        NIMClient.getService(MsgServiceObserve.class).observeCustomNotification(commandObserver, register);
+//        NIMClient.getService(MsgServiceObserve.class).observeCustomNotification(commandObserver, register);
         NimUIKit.getContactChangedObservable().registerObserver(friendDataChangedObserver, register);
     }
 
@@ -185,39 +185,39 @@ public class P2PMessageActivity extends BaseMessageActivity {
         }
     }
 
-    /**
-     * 命令消息接收观察者
-     */
-    Observer<CustomNotification> commandObserver = new Observer<CustomNotification>() {
-        @Override
-        public void onEvent(CustomNotification message) {
-            if (!sessionId.equals(message.getSessionId()) || message.getSessionType() != SessionTypeEnum.P2P) {
-                return;
-            }
-            showCommandMessage(message);
-        }
-    };
+//    /**
+//     * 命令消息接收观察者
+//     */
+//    Observer<CustomNotification> commandObserver = new Observer<CustomNotification>() {
+//        @Override
+//        public void onEvent(CustomNotification message) {
+//            if (!sessionId.equals(message.getSessionId()) || message.getSessionType() != SessionTypeEnum.P2P) {
+//                return;
+//            }
+//            showCommandMessage(message);
+//        }
+//    };
 
-    protected void showCommandMessage(CustomNotification message) {
-        if (!isResume) {
-            return;
-        }
-
-        String content = message.getContent();
-        try {
-            JSONObject json = JSON.parseObject(content);
-            int id = json.getIntValue("id");
-            if (id == 1) {
-                // 正在输入
-                Toast.makeText(P2PMessageActivity.this, "对方正在输入...", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(P2PMessageActivity.this, "command: " + content, Toast.LENGTH_SHORT).show();
-            }
-
-        } catch (Exception e) {
-
-        }
-    }
+//    protected void showCommandMessage(CustomNotification message) {
+//        if (!isResume) {
+//            return;
+//        }
+//
+//        String content = message.getContent();
+//        try {
+//            JSONObject json = JSON.parseObject(content);
+//            int id = json.getIntValue("id");
+//            if (id == 1) {
+//                // 正在输入
+//                Toast.makeText(P2PMessageActivity.this, "对方正在输入...", Toast.LENGTH_LONG).show();
+//            } else {
+//                Toast.makeText(P2PMessageActivity.this, "command: " + content, Toast.LENGTH_SHORT).show();
+//            }
+//
+//        } catch (Exception e) {
+//
+//        }
+//    }
 
     @Override
     protected MessageFragment fragment() {
