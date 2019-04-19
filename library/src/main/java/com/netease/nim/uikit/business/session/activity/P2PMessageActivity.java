@@ -18,6 +18,7 @@ import com.netease.nim.uikit.api.model.contact.ContactChangedObserver;
 import com.netease.nim.uikit.api.model.main.OnlineStateChangeObserver;
 import com.netease.nim.uikit.api.model.session.SessionCustomization;
 import com.netease.nim.uikit.api.model.user.UserInfoObserver;
+import com.netease.nim.uikit.business.session.audio.MessageAudioControl;
 import com.netease.nim.uikit.business.session.constant.Extras;
 import com.netease.nim.uikit.business.session.fragment.MessageFragment;
 import com.netease.nim.uikit.business.uinfo.UserInfoHelper;
@@ -81,6 +82,7 @@ public class P2PMessageActivity extends BaseMessageActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        MessageAudioControl.getInstance().changeAudioControlListener(null);
         registerObservers(false);
         registerOnlineStateChangeListener(false);
     }
