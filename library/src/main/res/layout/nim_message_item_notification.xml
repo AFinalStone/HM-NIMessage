@@ -11,7 +11,8 @@
         android:gravity="center"
         android:paddingLeft="7dip"
         android:paddingRight="7dip"
+        android:text="提示消息"
         android:textColor="#ffffff"
-        android:textSize="12sp"/>
+        android:textSize="12sp" />
 
 </merge>

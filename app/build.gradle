@@ -26,11 +26,19 @@ android {
 //    }
 
     buildTypes {
-//        debug {
-//            signingConfig signingConfigs.hmiou
-//            ext.enableCrashlytics = false
-//        }
 
+//        debug {
+//            // 是否开启混淆
+//            minifyEnabled true
+//            // 开启ZipAlign优化
+//            zipAlignEnabled true
+//            //去掉不用资源
+//            shrinkResources true
+//            混淆文件位置
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            signingConfig signingConfigs.hmiou
+
+//        }
 //        release {
 //            shrinkResources true
 //            minifyEnabled true

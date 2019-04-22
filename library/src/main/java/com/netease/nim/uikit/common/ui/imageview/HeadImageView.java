@@ -22,7 +22,7 @@ public class HeadImageView extends CircleImageView {
 
     public static final int DEFAULT_AVATAR_THUMB_SIZE = (int) NimUIKit.getContext().getResources().getDimension(R.dimen.avatar_max_size);
     public static final int DEFAULT_AVATAR_NOTIFICATION_ICON_SIZE = (int) NimUIKit.getContext().getResources().getDimension(R.dimen.avatar_notification_size);
-    private static final int DEFAULT_AVATAR_RES_ID = R.drawable.nim_avatar_default;
+    private static final int DEFAULT_AVATAR_RES_ID = R.mipmap.uikit_icon_header_unknow;
 
     public HeadImageView(Context context) {
         super(context);
@@ -99,7 +99,7 @@ public class HeadImageView extends CircleImageView {
 //                .apply(requestOptions)
 //                .into(this);
         if (TextUtils.isEmpty(url)) {
-            Picasso.get().load(R.drawable.nim_avatar_default)
+            Picasso.get().load(R.mipmap.uikit_icon_header_unknow)
                     .centerCrop()
                     .resize(thumbSize, thumbSize)
                     .placeholder(defaultResId)

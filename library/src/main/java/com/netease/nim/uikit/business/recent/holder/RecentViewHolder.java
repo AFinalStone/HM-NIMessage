@@ -172,7 +172,7 @@ public abstract class RecentViewHolder extends RecyclerViewHolder<BaseQuickAdapt
         MsgStatusEnum status = recent.getMsgStatus();
         switch (status) {
             case fail:
-                imgMsgStatus.setImageResource(R.drawable.nim_g_ic_failed_small);
+                imgMsgStatus.setImageResource(R.drawable.nim_ic_failed_small);
                 imgMsgStatus.setVisibility(View.VISIBLE);
                 break;
             case sending:
