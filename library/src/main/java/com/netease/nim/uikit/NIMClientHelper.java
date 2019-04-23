@@ -1,5 +1,6 @@
 package com.netease.nim.uikit;
 
+import com.hm.iou.logger.Logger;
 import com.netease.nim.uikit.event.SendMsgFailedEvent;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.RequestCallback;
@@ -18,7 +19,7 @@ public class NIMClientHelper {
         NIMClient.getService(MsgService.class).sendMessage(message, resend).setCallback(new RequestCallback<Void>() {
             @Override
             public void onSuccess(Void param) {
-
+                Logger.d("发送成功");
             }
 
             @Override
@@ -31,7 +32,7 @@ public class NIMClientHelper {
 
             @Override
             public void onException(Throwable exception) {
-
+                Logger.d("发生异常" + exception.getMessage());
             }
         });
     }

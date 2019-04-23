@@ -269,7 +269,7 @@ public class MessageFragment extends TFragment implements ModuleProxy {
     // 被对方拉入黑名单后，发消息失败的交互处理
     private void sendFailWithBlackList(IMMessage msg) {
         // 如果被对方拉入黑名单，发送的消息前不显示重发红点
-        msg.setStatus(MsgStatusEnum.success);
+        msg.setStatus(MsgStatusEnum.fail);
         NIMClient.getService(MsgService.class).updateIMMessageStatus(msg);
         messageListPanel.refreshMessageList();
         // 同时，本地插入被对方拒收的tip消息
@@ -281,7 +281,7 @@ public class MessageFragment extends TFragment implements ModuleProxy {
         tip.setConfig(config);
         //自定义本地tip消息
         HashMap<String, Object> tipMap = new HashMap<>();
-        tipMap.put(NIMConstant.CUSTOM_MSG_TIP, LocalExtensionMsgTipEnum.is_no_friend.getType());
+        tipMap.put(NIMConstant.CUSTOM_MSG_TIP, LocalExtensionMsgTipEnum.in_black_name.getType());
         tip.setLocalExtension(tipMap);
         NIMClient.getService(MsgService.class).saveMessageToLocal(tip, true);
     }    // 被对方拉入黑名单后，发消息失败的交互处理

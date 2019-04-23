@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.hm.iou.uikit.dialog.HMAlertDialog;
 import com.netease.nim.uikit.LocalExtensionMsgTipEnum;
 import com.netease.nim.uikit.NIMClientHelper;
 import com.netease.nim.uikit.NIMConstant;
@@ -734,11 +735,27 @@ public class MessageListPanelEx {
     private class MsgItemEventListener implements MsgAdapter.ViewHolderEventListener {
 
         @Override
-        public void onFailedBtnClick(IMMessage message) {
+        public void onFailedBtnClick(final IMMessage message) {
             if (message.getDirect() == MsgDirectionEnum.Out) {
                 // 发出的消息，如果是发送失败，直接重发，否则有可能是漫游到的多媒体消息，但文件下载
                 if (message.getStatus() == MsgStatusEnum.fail) {
-                    resendMessage(message); // 重发
+                    new HMAlertDialog
+                            .Builder(rootView.getContext())
+                            .setTitle("重发该消息吗？")
+                            .setNegativeButton("取消")
+                            .setPositiveButton("重发")
+                            .setOnClickListener(new HMAlertDialog.OnClickListener() {
+                                @Override
+                                public void onPosClick() {
+                                    resendMessage(message); // 重发
+                                }
+
+                                @Override
+                                public void onNegClick() {
+
+                                }
+                            })
+                            .create().show();
                 } else {
                     if (message.getAttachment() instanceof FileAttachment) {
                         FileAttachment attachment = (FileAttachment) message.getAttachment();
@@ -747,7 +764,23 @@ public class MessageListPanelEx {
                             showReDownloadConfirmDlg(message);
                         }
                     } else {
-                        resendMessage(message);
+                        new HMAlertDialog
+                                .Builder(rootView.getContext())
+                                .setTitle("重发该消息吗？")
+                                .setNegativeButton("取消")
+                                .setPositiveButton("重发")
+                                .setOnClickListener(new HMAlertDialog.OnClickListener() {
+                                    @Override
+                                    public void onPosClick() {
+                                        resendMessage(message); // 重发
+                                    }
+
+                                    @Override
+                                    public void onNegClick() {
+
+                                    }
+                                })
+                                .create().show();
                     }
                 }
             } else {
@@ -803,8 +836,7 @@ public class MessageListPanelEx {
                     Map<String, Object> tipMsp = itemTip.getLocalExtension();
                     if (tipMsp != null) {
                         Integer type = (Integer) tipMsp.get(NIMConstant.CUSTOM_MSG_TIP);
-                        if (LocalExtensionMsgTipEnum.is_no_friend.getType() == type ||
-                                LocalExtensionMsgTipEnum.is_no_friend.getType() == type) {
+                        if (LocalExtensionMsgTipEnum.is_no_friend.getType() == type || LocalExtensionMsgTipEnum.in_black_name.getType() == type) {
                             deleteItem(itemTip, true);
                         }
                     }
@@ -812,7 +844,7 @@ public class MessageListPanelEx {
                 deleteItem(item, true);
                 onMsgSend(item);
             }
-            NIMClientHelper.sendMsg(message, true);
+            NIMClientHelper.sendMsg(message, false);
         }
 
         /**
