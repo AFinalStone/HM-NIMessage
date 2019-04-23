@@ -118,7 +118,7 @@ public abstract class MsgViewHolderBase extends RecyclerViewHolder<BaseMultiItem
 
     // 是否显示已读，默认为显示
     protected boolean shouldDisplayReceipt() {
-        return true;
+        return false;
     }
 
     /// -- 以下接口可由子类调用
@@ -129,7 +129,6 @@ public abstract class MsgViewHolderBase extends RecyclerViewHolder<BaseMultiItem
     protected boolean shouldDisplayNick() {
         return message.getSessionType() == SessionTypeEnum.Team && isReceivedMessage() && !isMiddleItem();
     }
-
 
     /**
      * 下载附件/缩略图

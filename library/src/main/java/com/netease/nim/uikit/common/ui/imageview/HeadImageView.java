@@ -6,13 +6,14 @@ import android.util.AttributeSet;
 
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.NimUIKit;
+import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
-import com.netease.nimlib.sdk.nos.model.NosThumbParam;
-import com.netease.nimlib.sdk.nos.util.NosThumbImageUtil;
 import com.netease.nimlib.sdk.robot.model.RobotAttachment;
 import com.netease.nimlib.sdk.team.model.Team;
-import com.netease.nimlib.sdk.uinfo.model.UserInfo;
+import com.netease.nimlib.sdk.uinfo.UserService;
+import com.netease.nimlib.sdk.uinfo.constant.GenderEnum;
+import com.netease.nimlib.sdk.uinfo.model.NimUserInfo;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -22,7 +23,6 @@ public class HeadImageView extends CircleImageView {
 
     public static final int DEFAULT_AVATAR_THUMB_SIZE = (int) NimUIKit.getContext().getResources().getDimension(R.dimen.avatar_max_size);
     public static final int DEFAULT_AVATAR_NOTIFICATION_ICON_SIZE = (int) NimUIKit.getContext().getResources().getDimension(R.dimen.avatar_notification_size);
-    private static final int DEFAULT_AVATAR_RES_ID = R.mipmap.uikit_icon_header_unknow;
 
     public HeadImageView(Context context) {
         super(context);
@@ -42,7 +42,7 @@ public class HeadImageView extends CircleImageView {
      * @param url 头像地址
      */
     public void loadAvatar(final String url) {
-        doLoadImage(url, DEFAULT_AVATAR_RES_ID, DEFAULT_AVATAR_THUMB_SIZE);
+        doLoadImage(url, R.mipmap.uikit_icon_header_unknow, DEFAULT_AVATAR_THUMB_SIZE);
     }
 
     /**
@@ -51,8 +51,21 @@ public class HeadImageView extends CircleImageView {
      * @param account 用户账号
      */
     public void loadBuddyAvatar(String account) {
-        final UserInfo userInfo = NimUIKit.getUserInfoProvider().getUserInfo(account);
-        doLoadImage(userInfo != null ? userInfo.getAvatar() : null, DEFAULT_AVATAR_RES_ID, DEFAULT_AVATAR_THUMB_SIZE);
+        NimUserInfo nimUserInfo = NIMClient.getService(UserService.class).getUserInfo(account);
+        String headerImgUrl = "";
+        if (nimUserInfo != null) {
+            headerImgUrl = nimUserInfo.getAvatar();
+        }
+        int headerDefaultResId = R.mipmap.uikit_icon_header_unknow;
+        GenderEnum genderEnum = nimUserInfo.getGenderEnum();
+        if (genderEnum != null) {
+            if (1 == genderEnum.getValue()) {
+                headerDefaultResId = R.mipmap.person_ic_header_man;
+            } else if (2 == genderEnum.getValue()) {
+                headerDefaultResId = R.mipmap.person_ic_header_wuman;
+            }
+        }
+        doLoadImage(headerImgUrl, headerDefaultResId, DEFAULT_AVATAR_THUMB_SIZE);
     }
 
     /**
@@ -84,22 +97,8 @@ public class HeadImageView extends CircleImageView {
      * ImageLoader异步加载
      */
     private void doLoadImage(String url, int defaultResId, int thumbSize) {
-        /*
-         * 若使用网易云信云存储，这里可以设置下载图片的压缩尺寸，生成下载URL
-         * 如果图片来源是非网易云信云存储，请不要使用NosThumbImageUtil
-         */
-//        String thumbUrl = makeAvatarThumbNosUrl(url, thumbSize);
-//        RequestOptions requestOptions = new RequestOptions()
-//                .centerCrop()
-//                .placeholder(defaultResId)
-//                .error(defaultResId)
-//                .override(thumbSize, thumbSize);
-//        Glide.with(getContext().getApplicationContext()).asBitmap()
-//                .load(thumbUrl)
-//                .apply(requestOptions)
-//                .into(this);
         if (TextUtils.isEmpty(url)) {
-            Picasso.get().load(R.mipmap.uikit_icon_header_unknow)
+            Picasso.get().load(defaultResId)
                     .centerCrop()
                     .resize(thumbSize, thumbSize)
                     .placeholder(defaultResId)
