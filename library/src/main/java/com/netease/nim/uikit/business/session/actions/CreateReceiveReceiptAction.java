@@ -18,7 +18,7 @@ public class CreateReceiveReceiptAction extends BaseAction {
     @Override
     public void onClick() {
         Router.getInstance()
-                .buildWithUrl("hmiou://m.54jietiao.com/iou_create/select_type?select_type=elec_receive")
+                .buildWithUrl("hmiou://m.54jietiao.com/iou_create/elec_receive_create_or_modic_receipt")
                 .navigation(getActivity());
     }
 }
