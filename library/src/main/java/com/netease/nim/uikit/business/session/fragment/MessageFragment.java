@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.netease.nim.uikit.NIMClientHelper;
+import com.hm.iou.logger.Logger;
 import com.netease.nim.uikit.LocalExtensionMsgTipEnum;
 import com.netease.nim.uikit.NIMConstant;
 import com.netease.nim.uikit.R;
@@ -31,6 +31,7 @@ import com.netease.nim.uikit.event.SendMsgFailedEvent;
 import com.netease.nim.uikit.impl.NimUIKitImpl;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.Observer;
+import com.netease.nimlib.sdk.RequestCallback;
 import com.netease.nimlib.sdk.ResponseCode;
 import com.netease.nimlib.sdk.msg.MessageBuilder;
 import com.netease.nimlib.sdk.msg.MsgService;
@@ -255,7 +256,26 @@ public class MessageFragment extends TFragment implements ModuleProxy {
             final IMMessage msg = message;
             appendPushConfig(message);
             // send message to server and save to db
-            NIMClientHelper.sendMsg(message, false);
+            NIMClient.getService(MsgService.class).sendMessage(message, false).setCallback(new RequestCallback<Void>() {
+                @Override
+                public void onSuccess(Void param) {
+                    Logger.d("发送成功");
+                }
+
+                @Override
+                public void onFailed(int code) {
+                    SendMsgFailedEvent sendMsgFailedEvent = new SendMsgFailedEvent();
+                    sendMsgFailedEvent.setFailedCode(code);
+                    sendMsgFailedEvent.setReSend(false);
+                    sendMsgFailedEvent.setMessage(msg);
+                    EventBus.getDefault().post(sendMsgFailedEvent);
+                }
+
+                @Override
+                public void onException(Throwable exception) {
+                    Logger.d("发生异常" + exception.getMessage());
+                }
+            });
         }
 
         messageListPanel.onMsgSend(message);
@@ -267,47 +287,53 @@ public class MessageFragment extends TFragment implements ModuleProxy {
     }
 
     // 被对方拉入黑名单后，发消息失败的交互处理
-    private void sendFailWithBlackList(IMMessage msg) {
+    private void sendFailWithBlackList(IMMessage msg, boolean isReSend) {
         // 如果被对方拉入黑名单，发送的消息前不显示重发红点
         msg.setStatus(MsgStatusEnum.fail);
         NIMClient.getService(MsgService.class).updateIMMessageStatus(msg);
         messageListPanel.refreshMessageList();
-        // 同时，本地插入被对方拒收的tip消息
-        IMMessage tip = MessageBuilder.createTipMessage(msg.getSessionId(), msg.getSessionType());
-        tip.setContent(getActivity().getString(R.string.black_list_send_tip));
-        tip.setStatus(MsgStatusEnum.success);
-        CustomMessageConfig config = new CustomMessageConfig();
-        config.enableUnreadCount = false;
-        tip.setConfig(config);
-        //自定义本地tip消息
-        HashMap<String, Object> tipMap = new HashMap<>();
-        tipMap.put(NIMConstant.CUSTOM_MSG_TIP, LocalExtensionMsgTipEnum.in_black_name.getType());
-        tip.setLocalExtension(tipMap);
-        NIMClient.getService(MsgService.class).saveMessageToLocal(tip, true);
-    }    // 被对方拉入黑名单后，发消息失败的交互处理
+        if (!isReSend) {
+            // 同时，本地插入被对方拒收的tip消息
+            IMMessage tip = MessageBuilder.createTipMessage(msg.getSessionId(), msg.getSessionType());
+            tip.setContent(getActivity().getString(R.string.black_list_send_tip));
+            tip.setStatus(MsgStatusEnum.success);
+            CustomMessageConfig config = new CustomMessageConfig();
+            config.enableUnreadCount = false;
+            tip.setConfig(config);
+            //自定义本地tip消息
+            HashMap<String, Object> tipMap = new HashMap<>();
+            tipMap.put(NIMConstant.CUSTOM_MSG_TIP, LocalExtensionMsgTipEnum.in_black_name.getType());
+            tipMap.put(NIMConstant.CUSTOM_MSG_TIP_UUID, msg.getUuid());
+            tip.setLocalExtension(tipMap);
+            NIMClient.getService(MsgService.class).saveMessageToLocal(tip, true);
+        }
+    }
 
     /**
      * 两个人还不是好友关系
      *
      * @param msg
      */
-    private void sendFailWithIsNoFriend(IMMessage msg) {
+    private void sendFailWithIsNoFriend(IMMessage msg, boolean isReSend) {
         // 如果被对方拉入黑名单，发送的消息前不显示重发红点
         msg.setStatus(MsgStatusEnum.fail);
         NIMClient.getService(MsgService.class).updateIMMessageStatus(msg);
         messageListPanel.refreshMessageList();
-        // 同时，本地插入两个人还不是好友的tip消息
-        IMMessage tip = MessageBuilder.createTipMessage(msg.getSessionId(), msg.getSessionType());
-        tip.setContent(getActivity().getString(R.string.no_friend_send_tip));
-        tip.setStatus(MsgStatusEnum.success);
-        CustomMessageConfig config = new CustomMessageConfig();
-        config.enableUnreadCount = false;
-        tip.setConfig(config);
-        //自定义本地tip消息
-        HashMap<String, Object> tipMap = new HashMap<>();
-        tipMap.put(NIMConstant.CUSTOM_MSG_TIP, LocalExtensionMsgTipEnum.is_no_friend.getType());
-        tip.setLocalExtension(tipMap);
-        NIMClient.getService(MsgService.class).saveMessageToLocal(tip, true);
+        if (!isReSend) {
+            // 同时，本地插入两个人还不是好友的tip消息
+            IMMessage tip = MessageBuilder.createTipMessage(msg.getSessionId(), msg.getSessionType());
+            tip.setContent(getActivity().getString(R.string.no_friend_send_tip));
+            tip.setStatus(MsgStatusEnum.success);
+            CustomMessageConfig config = new CustomMessageConfig();
+            config.enableUnreadCount = false;
+            tip.setConfig(config);
+            //自定义本地tip消息
+            HashMap<String, Object> tipMap = new HashMap<>();
+            tipMap.put(NIMConstant.CUSTOM_MSG_TIP, LocalExtensionMsgTipEnum.is_no_friend.getType());
+            tipMap.put(NIMConstant.CUSTOM_MSG_TIP_UUID, msg.getUuid());
+            tip.setLocalExtension(tipMap);
+            NIMClient.getService(MsgService.class).saveMessageToLocal(tip, true);
+        }
     }
 
     private void appendTeamMemberPush(IMMessage message) {
@@ -438,9 +464,9 @@ public class MessageFragment extends TFragment implements ModuleProxy {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvenRedFlagCount(SendMsgFailedEvent sendMsgFailedEvent) {
         if (NIMConstant.RES_IS_NO_FRIEND == sendMsgFailedEvent.getFailedCode()) {
-            sendFailWithIsNoFriend(sendMsgFailedEvent.getMessage());//非好友
+            sendFailWithIsNoFriend(sendMsgFailedEvent.getMessage(), sendMsgFailedEvent.isReSend());//非好友
         } else if (ResponseCode.RES_IN_BLACK_LIST == sendMsgFailedEvent.getFailedCode()) {
-            sendFailWithBlackList(sendMsgFailedEvent.getMessage());//黑名单
+            sendFailWithBlackList(sendMsgFailedEvent.getMessage(), sendMsgFailedEvent.isReSend());//黑名单
         }
     }
 }

@@ -35,13 +35,6 @@ public class MainActivity extends AppCompatActivity {
 //                NimUIKit.startP2PSession(MainActivity.this, "d1000393");//石磊            }
             }
         });
-        RxPermissions rxPermissions = new RxPermissions(this);
-        rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO).subscribe(new Consumer<Boolean>() {
-            @Override
-            public void accept(Boolean aBoolean) throws Exception {
-
-            }
-        });
     }
 
     public void login() {

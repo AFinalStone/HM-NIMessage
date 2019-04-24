@@ -14,9 +14,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.hm.iou.logger.Logger;
 import com.hm.iou.uikit.dialog.HMAlertDialog;
-import com.netease.nim.uikit.LocalExtensionMsgTipEnum;
-import com.netease.nim.uikit.NIMClientHelper;
 import com.netease.nim.uikit.NIMConstant;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.NimUIKit;
@@ -41,6 +40,7 @@ import com.netease.nim.uikit.common.util.media.BitmapDecoder;
 import com.netease.nim.uikit.common.util.sys.ClipboardUtil;
 import com.netease.nim.uikit.common.util.sys.NetworkUtil;
 import com.netease.nim.uikit.common.util.sys.ScreenUtil;
+import com.netease.nim.uikit.event.SendMsgFailedEvent;
 import com.netease.nim.uikit.impl.NimUIKitImpl;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.NIMSDK;
@@ -66,6 +66,8 @@ import com.netease.nimlib.sdk.robot.model.RobotAttachment;
 import com.netease.nimlib.sdk.robot.model.RobotMsgType;
 import com.netease.nimlib.sdk.team.constant.TeamMemberType;
 import com.netease.nimlib.sdk.team.model.TeamMember;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -825,26 +827,53 @@ public class MessageListPanelEx {
 
         // 重发消息到服务器
         private void resendMessage(IMMessage message) {
-            // 重置状态为unsent
+            // 删除本地列表的消息
             int index = getItemIndex(message.getUuid());
             if (index >= 0 && index < items.size()) {
                 IMMessage item = items.get(index);
-                item.setStatus(MsgStatusEnum.sending);
-                //删除下方的提示文案
-                if (index + 1 < items.size()) {
-                    IMMessage itemTip = items.get(index + 1);
-                    Map<String, Object> tipMsp = itemTip.getLocalExtension();
-                    if (tipMsp != null) {
-                        Integer type = (Integer) tipMsp.get(NIMConstant.CUSTOM_MSG_TIP);
-                        if (LocalExtensionMsgTipEnum.is_no_friend.getType() == type || LocalExtensionMsgTipEnum.in_black_name.getType() == type) {
-                            deleteItem(itemTip, true);
-                        }
+                deleteItem(item, true);
+            }
+            //删除本地列表的消息的附加提示信息
+            IMMessage itemTip = null;
+            for (int i = 0; i < items.size(); i++) {
+                itemTip = items.get(index);
+                Map<String, Object> tipMsp = itemTip.getLocalExtension();
+                if (tipMsp != null) {
+                    String strUuid = (String) tipMsp.get(NIMConstant.CUSTOM_MSG_TIP_UUID);
+                    if (message.getUuid().equals(strUuid)) {
+                        deleteItem(itemTip, true);
+                        break;
                     }
                 }
-                deleteItem(item, true);
-                onMsgSend(item);
             }
-            NIMClientHelper.sendMsg(message, false);
+            message.setStatus(MsgStatusEnum.sending);
+            onMsgSend(message);
+            final IMMessage finalMessage = message;
+            final IMMessage finalItemTip = itemTip;
+            //这里第二个参数如果设置为true，黑名单消息会发送成功，不知道是否是IM——bug
+            NIMClient.getService(MsgService.class).sendMessage(message, false).setCallback(new RequestCallback<Void>() {
+                @Override
+                public void onSuccess(Void param) {
+                    Logger.d("发送成功");
+                }
+
+                @Override
+                public void onFailed(int code) {
+                    if (finalItemTip != null) {
+                        onMsgSend(finalItemTip);
+                    }
+                    SendMsgFailedEvent sendMsgFailedEvent = new SendMsgFailedEvent();
+                    sendMsgFailedEvent.setFailedCode(code);
+                    sendMsgFailedEvent.setReSend(true);
+                    sendMsgFailedEvent.setMessage(finalMessage);
+                    EventBus.getDefault().post(sendMsgFailedEvent);
+                }
+
+                @Override
+                public void onException(Throwable exception) {
+                    Logger.d("发生异常" + exception.getMessage());
+                }
+            });
         }
 
         /**

@@ -10,6 +10,7 @@ public class SendMsgFailedEvent {
 
     private IMMessage message;
     int failedCode;//错误码
+    boolean isReSend;//是否是重复发送的
 
     public SendMsgFailedEvent() {
     }
@@ -28,5 +29,13 @@ public class SendMsgFailedEvent {
 
     public void setFailedCode(int failedCode) {
         this.failedCode = failedCode;
+    }
+
+    public boolean isReSend() {
+        return isReSend;
+    }
+
+    public void setReSend(boolean reSend) {
+        isReSend = reSend;
     }
 }

@@ -14,7 +14,7 @@ public enum LocalExtensionMsgTipEnum {
      */
     in_black_name(1, "黑名单");
 
-    Integer type;
+    int type;
     String desc;
 
     LocalExtensionMsgTipEnum(Integer type, String desc) {
@@ -22,7 +22,7 @@ public enum LocalExtensionMsgTipEnum {
         this.desc = desc;
     }
 
-    public Integer getType() {
+    public int getType() {
         return type;
     }
 

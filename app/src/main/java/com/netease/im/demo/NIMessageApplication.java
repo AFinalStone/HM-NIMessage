@@ -61,7 +61,7 @@ public class NIMessageApplication extends Application {
         // 初始化
         NimUIKit.init(this, buildUIKitOptions());
         //黑名单
-        NimUIKit.registerTipMsgViewHolder(MsgViewHolderTip.class);
+        NimUIKit.registerTipMsgViewHolder(HmNotificationMsgViewHolder.class);
     }
 
     private UIKitOptions buildUIKitOptions() {
