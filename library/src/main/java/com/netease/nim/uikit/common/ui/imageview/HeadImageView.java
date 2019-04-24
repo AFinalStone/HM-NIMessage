@@ -53,11 +53,12 @@ public class HeadImageView extends CircleImageView {
     public void loadBuddyAvatar(String account) {
         NimUserInfo nimUserInfo = NIMClient.getService(UserService.class).getUserInfo(account);
         String headerImgUrl = "";
+        GenderEnum genderEnum = GenderEnum.UNKNOWN;
         if (nimUserInfo != null) {
             headerImgUrl = nimUserInfo.getAvatar();
+            genderEnum = nimUserInfo.getGenderEnum();
         }
         int headerDefaultResId = R.mipmap.uikit_icon_header_unknow;
-        GenderEnum genderEnum = nimUserInfo.getGenderEnum();
         if (genderEnum != null) {
             if (1 == genderEnum.getValue()) {
                 headerDefaultResId = R.mipmap.person_ic_header_man;
