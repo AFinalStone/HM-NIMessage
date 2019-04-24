@@ -18,7 +18,8 @@ public class CreateBorrowReceiptAction extends BaseAction {
     @Override
     public void onClick() {
         Router.getInstance()
-                .buildWithUrl("hmiou://m.54jietiao.com/iou_create/select_type?select_type=elec_borrow")
+                .buildWithUrl("hmiou://m.54jietiao.com/facecheck/checkLiveness")
+                .withString("url", "hmiou://m.54jietiao.com/iou_create/elec_borrow_create_prepare")
                 .navigation(getActivity());
     }
 }
