@@ -10,12 +10,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.hm.iou.sharedata.event.CommBizEvent;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.model.session.SessionCustomization;
 import com.netease.nim.uikit.business.session.constant.Extras;
 import com.netease.nim.uikit.business.session.fragment.MessageFragment;
 import com.netease.nim.uikit.common.activity.UI;
+import com.netease.nim.uikit.common.util.string.StringUtil;
 import com.netease.nim.uikit.common.util.sys.ScreenUtil;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -45,6 +51,14 @@ public abstract class BaseMessageActivity extends UI {
         parseIntent();
 
         messageFragment = (MessageFragment) switchContent(fragment());
+
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -104,6 +118,16 @@ public abstract class BaseMessageActivity extends UI {
         }
 
         toolbar.addView(view, new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.RIGHT | Gravity.CENTER));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventDeleteFriend(CommBizEvent event) {
+        if ("msgcenter_delelte_friend".equals(event.key)) {
+            String imAccId = event.content;
+            if (com.hm.iou.tools.StringUtil.getUnnullString(sessionId).equals(imAccId)) {
+                finish();
+            }
+        }
     }
 
 }
