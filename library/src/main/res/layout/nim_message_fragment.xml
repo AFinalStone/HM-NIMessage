@@ -39,10 +39,10 @@
 
         <FrameLayout
             android:id="@+id/layoutPlayAudio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="136dip"
+            android:layout_height="136dip"
             android:layout_gravity="center"
-            android:background="@drawable/nim_dialog_toast_bg"
+            android:background="@drawable/nim_bg_dialog_toast"
             android:visibility="gone">
 
             <Chronometer
@@ -52,11 +52,63 @@
                 android:layout_gravity="center"
                 android:text="@string/timer_default"
                 android:textColor="@color/white"
-                android:textSize="45sp"/>
+                android:textSize="45sp"
+                android:visibility="invisible"
+                />
+
+            <TextView
+                android:id="@+id/tv_msg_record_countdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="10"
+                android:textColor="@color/white"
+                android:textSize="60dp"
+                android:visibility="gone"
+                android:layout_marginBottom="10dip"
+                />
+
+            <ImageView
+                android:id="@+id/iv_msg_record_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/nim_ic_record_cancel"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                android:layout_marginBottom="10dip"
+                />
+
+            <RelativeLayout
+                android:id="@+id/rl_msg_record_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:layout_marginBottom="10dip"
+                >
+
+                <ImageView
+                    android:id="@+id/iv_msg_record_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/nim_ic_record_start"
+                    />
+                <ImageView
+                    android:id="@+id/iv_msg_audio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/nim_ic_auto_5"
+                    android:layout_toRightOf="@id/iv_msg_record_start"
+                    android:layout_alignBottom="@id/iv_msg_record_start"
+                    android:layout_marginLeft="5dip"
+                    />
+
+            </RelativeLayout>
+
 
             <LinearLayout
                 android:id="@+id/timer_tip_container"
-                android:layout_width="188dp"
+                android:layout_width="136dip"
                 android:layout_height="40dp"
                 android:layout_gravity="bottom"
                 android:gravity="center">
@@ -68,7 +120,7 @@
                     android:layout_gravity="center"
                     android:text="@string/recording_cancel"
                     android:textColor="@color/white"
-                    android:textSize="20sp"/>
+                    android:textSize="13sp"/>
             </LinearLayout>
         </FrameLayout>
 
