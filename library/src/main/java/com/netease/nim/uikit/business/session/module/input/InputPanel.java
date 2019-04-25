@@ -40,7 +40,6 @@ import com.netease.nim.uikit.business.session.emoji.EmoticonPickerView;
 import com.netease.nim.uikit.business.session.emoji.IEmoticonSelectedListener;
 import com.netease.nim.uikit.business.session.emoji.MoonUtil;
 import com.netease.nim.uikit.business.session.module.Container;
-import com.netease.nim.uikit.common.ui.dialog.EasyAlertDialogHelper;
 import com.netease.nim.uikit.common.util.log.LogUtil;
 import com.netease.nim.uikit.common.util.string.StringUtil;
 import com.netease.nim.uikit.impl.NimUIKitImpl;
@@ -762,7 +761,7 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
     private void initAudioRecord() {
         if (audioMessageHelper == null) {
             UIKitOptions options = NimUIKitImpl.getOptions();
-            audioMessageHelper = new AudioRecorder(container.activity, options.audioRecordType, options.audioRecordMaxTime, this);
+            audioMessageHelper = new AudioRecorder(container.activity.getApplicationContext(), options.audioRecordType, options.audioRecordMaxTime, this);
         }
     }
 
