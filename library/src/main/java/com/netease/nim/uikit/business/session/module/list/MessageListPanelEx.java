@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.hm.iou.logger.Logger;
 import com.hm.iou.uikit.dialog.HMAlertDialog;
+import com.netease.nim.uikit.EventBusHelper;
 import com.netease.nim.uikit.NIMConstant;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.NimUIKit;
@@ -836,7 +837,7 @@ public class MessageListPanelEx {
             //删除本地列表的消息的附加提示信息
             IMMessage itemTip = null;
             for (int i = 0; i < items.size(); i++) {
-                itemTip = items.get(index);
+                itemTip = items.get(i);
                 Map<String, Object> tipMsp = itemTip.getLocalExtension();
                 if (tipMsp != null) {
                     String strUuid = (String) tipMsp.get(NIMConstant.CUSTOM_MSG_TIP_UUID);
@@ -855,6 +856,7 @@ public class MessageListPanelEx {
                 @Override
                 public void onSuccess(Void param) {
                     Logger.d("发送成功");
+                    EventBusHelper.postUpdateChatListEvent();
                 }
 
                 @Override
@@ -867,11 +869,13 @@ public class MessageListPanelEx {
                     sendMsgFailedEvent.setReSend(true);
                     sendMsgFailedEvent.setMessage(finalMessage);
                     EventBus.getDefault().post(sendMsgFailedEvent);
+                    EventBusHelper.postUpdateChatListEvent();
                 }
 
                 @Override
                 public void onException(Throwable exception) {
                     Logger.d("发生异常" + exception.getMessage());
+                    EventBusHelper.postUpdateChatListEvent();
                 }
             });
         }

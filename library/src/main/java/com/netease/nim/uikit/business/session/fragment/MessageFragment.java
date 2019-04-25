@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.hm.iou.logger.Logger;
+import com.netease.nim.uikit.EventBusHelper;
 import com.netease.nim.uikit.LocalExtensionMsgTipEnum;
 import com.netease.nim.uikit.NIMConstant;
 import com.netease.nim.uikit.R;
@@ -259,6 +260,7 @@ public class MessageFragment extends TFragment implements ModuleProxy {
             NIMClient.getService(MsgService.class).sendMessage(message, false).setCallback(new RequestCallback<Void>() {
                 @Override
                 public void onSuccess(Void param) {
+                    EventBusHelper.postUpdateChatListEvent();
                     Logger.d("发送成功");
                 }
 
@@ -269,10 +271,12 @@ public class MessageFragment extends TFragment implements ModuleProxy {
                     sendMsgFailedEvent.setReSend(false);
                     sendMsgFailedEvent.setMessage(msg);
                     EventBus.getDefault().post(sendMsgFailedEvent);
+                    EventBusHelper.postUpdateChatListEvent();
                 }
 
                 @Override
                 public void onException(Throwable exception) {
+                    EventBusHelper.postUpdateChatListEvent();
                     Logger.d("发生异常" + exception.getMessage());
                 }
             });
