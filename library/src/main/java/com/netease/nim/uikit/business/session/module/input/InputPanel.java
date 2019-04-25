@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.text.Editable;
 import android.text.InputType;
@@ -21,12 +22,14 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hm.iou.base.utils.PermissionUtil;
+import com.hm.iou.logger.Logger;
 import com.netease.nim.uikit.R;
 import com.netease.nim.uikit.api.NimUIKit;
 import com.netease.nim.uikit.api.UIKitOptions;
@@ -69,6 +72,8 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
 
     private static final int SHOW_LAYOUT_DELAY = 200;
 
+    private static final int MSG_CODE_AUDIO_LEVEL = 100;
+
     protected Container container;
     protected View view;
     protected Handler uiHandler;
@@ -85,6 +90,11 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
     protected View sendMessageButtonInInputBar;// 发送消息按钮
     protected View emojiButtonInInputBar;// 发送消息按钮
     protected View messageInputBar;
+
+    protected ImageView mIvRecordCancel;    //录音取消图片
+    protected ImageView mIvAudio;           //音量大小
+    protected View mRlAudio;                //录音中显示
+    protected TextView mTvCountDown;        //10倒计时
 
     private SessionCustomization customization;
 
@@ -116,6 +126,38 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
     private TextWatcher aitTextWatcher;
     private Activity mActivity;
 
+    private int[] mAudioLevelRes = {
+            R.mipmap.nim_ic_auto_1,
+            R.mipmap.nim_ic_auto_2,
+            R.mipmap.nim_ic_auto_3,
+            R.mipmap.nim_ic_auto_4,
+            R.mipmap.nim_ic_auto_5,
+            R.mipmap.nim_ic_auto_6
+    };
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == MSG_CODE_AUDIO_LEVEL) {
+                if (audioMessageHelper != null) {
+                    int amplitude = audioMessageHelper.getCurrentRecordMaxAmplitude();
+
+                    int level = Math.min((int) (amplitude / 32768f * 6), 5);
+                    level = Math.max(level, 0);
+                    mIvAudio.setImageResource(mAudioLevelRes[level]);
+                }
+                if (started) {
+                    sendEmptyMessageDelayed(MSG_CODE_AUDIO_LEVEL, 50);
+                }
+            }
+        }
+    };
+
+    private int mRecordTimeSec = 0;
+    private boolean mShowCountDown = false;
+    private boolean mHasPermission = false;
+
     public InputPanel(Activity activity, Container container, View view, List<BaseAction> actions, boolean isTextAudioSwitchShow) {
         this.mActivity = activity;
         this.container = container;
@@ -142,6 +184,8 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
         if (audioMessageHelper != null) {
             audioMessageHelper.destroyAudioRecorder();
         }
+        started = false;
+        mHandler.removeMessages(MSG_CODE_AUDIO_LEVEL);
     }
 
     public boolean collapse(boolean immediately) {
@@ -199,6 +243,11 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
         time = (Chronometer) view.findViewById(R.id.timer);
         timerTip = (TextView) view.findViewById(R.id.timer_tip);
         timerTipContainer = (LinearLayout) view.findViewById(R.id.timer_tip_container);
+
+        mIvRecordCancel = view.findViewById(R.id.iv_msg_record_cancel);
+        mRlAudio = view.findViewById(R.id.rl_msg_record_start);
+        mIvAudio = view.findViewById(R.id.iv_msg_audio);
+        mTvCountDown = view.findViewById(R.id.tv_msg_record_countdown);
 
         // 表情
         emoticonPickerView = (EmoticonPickerView) view.findViewById(R.id.emoticon_picker_view);
@@ -630,18 +679,24 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     if (requestPermission()) {
                         touched = true;
+                        mHasPermission = true;
                         initAudioRecord();
                         onStartAudioRecord();
+                    } else {
+                        mHasPermission = false;
                     }
                 } else if (event.getAction() == MotionEvent.ACTION_CANCEL
                         || event.getAction() == MotionEvent.ACTION_UP) {
-                    touched = false;
-                    onEndAudioRecord(isCancelled(v, event));
+                    if (mHasPermission) {
+                        touched = false;
+                        onEndAudioRecord(isCancelled(v, event));
+                    }
                 } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    touched = true;
-                    cancelAudioRecord(isCancelled(v, event));
+                    if (mHasPermission) {
+                        touched = true;
+                        cancelAudioRecord(isCancelled(v, event));
+                    }
                 }
-
                 return false;
             }
         });
@@ -715,6 +770,7 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
      * 开始语音录制
      */
     private void onStartAudioRecord() {
+        Logger.d("Audio: start audio record...");
         if (audioMessageHelper != null) {
             container.activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                     WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -729,6 +785,7 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
      * @param cancel
      */
     private void onEndAudioRecord(boolean cancel) {
+        Logger.d("Audio: end audio record...");
         if (audioMessageHelper != null) {
             started = false;
             container.activity.getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -738,6 +795,7 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
             audioRecordBtn.setBackgroundResource(R.drawable.nim_message_input_edittext_box);
             stopAudioRecordAnim();
         }
+        mHandler.removeMessages(MSG_CODE_AUDIO_LEVEL);
     }
 
     /**
@@ -767,10 +825,24 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
     private void updateTimerTip(boolean cancel) {
         if (cancel) {
             timerTip.setText(R.string.recording_cancel_tip);
-            timerTipContainer.setBackgroundResource(R.drawable.nim_cancel_record_red_bg);
+//            timerTipContainer.setBackgroundResource(R.drawable.nim_cancel_record_red_bg);
+
+            mIvRecordCancel.setVisibility(View.VISIBLE);
+            mRlAudio.setVisibility(View.GONE);
+            mTvCountDown.setVisibility(View.GONE);
+
         } else {
             timerTip.setText(R.string.recording_cancel);
-            timerTipContainer.setBackgroundResource(0);
+//            timerTipContainer.setBackgroundResource(0);
+
+            mIvRecordCancel.setVisibility(View.GONE);
+            if (mShowCountDown) {
+                mTvCountDown.setVisibility(View.VISIBLE);
+                mRlAudio.setVisibility(View.GONE);
+            } else {
+                mTvCountDown.setVisibility(View.GONE);
+                mRlAudio.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -781,6 +853,30 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
         audioAnimLayout.setVisibility(View.VISIBLE);
         time.setBase(SystemClock.elapsedRealtime());
         time.start();
+        mRecordTimeSec = 0;
+        mShowCountDown = false;
+        mTvCountDown.setVisibility(View.GONE);
+        mRlAudio.setVisibility(View.VISIBLE);
+
+        time.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                mRecordTimeSec++;
+                if (mRecordTimeSec >= 50) {
+                    mShowCountDown = true;
+
+                    //开始显示倒计时；
+
+                    if (mIvRecordCancel.getVisibility() != View.VISIBLE) {
+                        mTvCountDown.setVisibility(View.VISIBLE);
+                        mRlAudio.setVisibility(View.GONE);
+                    }
+
+                    int c = 60 - mRecordTimeSec;
+                    mTvCountDown.setText(Math.max(c, 0) + "");
+                }
+            }
+        });
     }
 
     /**
@@ -788,8 +884,9 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
      */
     private void stopAudioRecordAnim() {
         audioAnimLayout.setVisibility(View.GONE);
+        mShowCountDown = false;
+        time.setOnChronometerTickListener(null);
         time.stop();
-        time.setBase(SystemClock.elapsedRealtime());
     }
 
     // 录音状态回调
@@ -801,6 +898,10 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
     @Override
     public void onRecordStart(File audioFile, RecordType recordType) {
         started = true;
+
+        mHandler.removeMessages(100);
+        mHandler.sendEmptyMessage(100);
+
         if (!touched) {
             return;
         }
@@ -833,7 +934,7 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
     @Override
     public void onRecordReachedMaxTime(final int maxTime) {
         stopAudioRecordAnim();
-        EasyAlertDialogHelper.createOkCancelDiolag(container.activity, "", container.activity.getString(R.string.recording_max_time), false, new EasyAlertDialogHelper.OnDialogActionListener() {
+/*        EasyAlertDialogHelper.createOkCancelDiolag(container.activity, "", container.activity.getString(R.string.recording_max_time), false, new EasyAlertDialogHelper.OnDialogActionListener() {
             @Override
             public void doCancelAction() {
             }
@@ -842,7 +943,10 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
             public void doOkAction() {
                 audioMessageHelper.handleEndRecord(true, maxTime);
             }
-        }).show();
+        }).show();*/
+
+        //到达最长时间后，直接发送
+        audioMessageHelper.handleEndRecord(true, maxTime);
     }
 
     public boolean isRecording() {
@@ -880,6 +984,6 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
             sendMessageButtonInInputBar.setVisibility(View.GONE);
             moreFuntionButtonInInputBar.setVisibility(View.VISIBLE);
         }
-
     }
+
 }
