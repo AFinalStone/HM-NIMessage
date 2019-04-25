@@ -142,7 +142,6 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
             if (msg.what == MSG_CODE_AUDIO_LEVEL) {
                 if (audioMessageHelper != null) {
                     int amplitude = audioMessageHelper.getCurrentRecordMaxAmplitude();
-                    Logger.d("当前分贝：" + amplitude + " " + started);
 
                     int level = Math.min((int) (amplitude / 32768f * 6), 5);
                     level = Math.max(level, 0);
@@ -157,6 +156,7 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
 
     private int mRecordTimeSec = 0;
     private boolean mShowCountDown = false;
+    private boolean mHasPermission = false;
 
     public InputPanel(Activity activity, Container container, View view, List<BaseAction> actions, boolean isTextAudioSwitchShow) {
         this.mActivity = activity;
@@ -679,18 +679,24 @@ public class InputPanel implements IEmoticonSelectedListener, IAudioRecordCallba
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     if (requestPermission()) {
                         touched = true;
+                        mHasPermission = true;
                         initAudioRecord();
                         onStartAudioRecord();
+                    } else {
+                        mHasPermission = false;
                     }
                 } else if (event.getAction() == MotionEvent.ACTION_CANCEL
                         || event.getAction() == MotionEvent.ACTION_UP) {
-                    touched = false;
-                    onEndAudioRecord(isCancelled(v, event));
+                    if (mHasPermission) {
+                        touched = false;
+                        onEndAudioRecord(isCancelled(v, event));
+                    }
                 } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    touched = true;
-                    cancelAudioRecord(isCancelled(v, event));
+                    if (mHasPermission) {
+                        touched = true;
+                        cancelAudioRecord(isCancelled(v, event));
+                    }
                 }
-
                 return false;
             }
         });
