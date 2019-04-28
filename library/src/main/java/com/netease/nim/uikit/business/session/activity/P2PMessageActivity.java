@@ -91,6 +91,7 @@ public class P2PMessageActivity extends BaseMessageActivity {
     protected void onResume() {
         super.onResume();
         isResume = true;
+        requestBuddyInfo();
     }
 
     @Override
