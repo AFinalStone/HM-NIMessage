@@ -23,19 +23,16 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
-
+    compile fileTree(include: '*.jar', dir: 'libs')
     compile 'me.everything:overscroll-decor-android:1.0.4'
-    compile "me.leolin:ShortcutBadger:1.1.17@aar"
-
+    compile 'me.leolin:ShortcutBadger:1.1.17@aar'
     api 'com.alibaba:fastjson:1.1.70.android'
     api 'com.netease.nimlib:basesdk:6.2.0'
     api 'com.netease.nimlib:chatroom:6.2.0'
     api 'com.netease.nimlib:lucene:6.2.0'
-    implementation 'com.netease.nimlib:push:6.1.1'
-
+    implementation 'com.netease.nimlib:push:6.3.0'
     compile 'com.heima.iou:hmbasebizlocal:1.0.0'
     compile 'com.heima.iou:hmpushlocal:1.0.0'
-
+    implementation files('libs/vivo_pushsdk_v2.3.4.jar')
 }
 apply from: './maven_local.gradle'
