@@ -32,8 +32,10 @@ dependencies {
     api 'com.netease.nimlib:basesdk:6.2.0'
     api 'com.netease.nimlib:chatroom:6.2.0'
     api 'com.netease.nimlib:lucene:6.2.0'
+    implementation 'com.netease.nimlib:push:6.1.1'
 
     compile 'com.heima.iou:hmbasebizlocal:1.0.0'
+    compile 'com.heima.iou:hmpushlocal:1.0.0'
 
 }
 apply from: './maven_local.gradle'
