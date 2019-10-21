@@ -50,7 +50,7 @@ public class NIMessageApplication extends Application {
     private void initIM() {
         NIMClient.init(this, getLoginInfo(), options());
         String packageName = getPackageName();
-        String processName = getProcessName();
+        String processName = getCurrentProcessName();
         if (packageName.equals(processName)) {
             // 初始化UIKit模块
             initUIKit();
@@ -138,7 +138,7 @@ public class NIMessageApplication extends Application {
      *
      * @return
      */
-    public String getProcessName() {
+    public String getCurrentProcessName() {
         String processName = null;
 
         // ActivityManager

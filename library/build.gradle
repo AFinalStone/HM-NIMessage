@@ -1,11 +1,11 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
 
+    compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 26
+        minSdkVersion 21
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
@@ -23,16 +23,16 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: '*.jar', dir: 'libs')
-    compile 'me.everything:overscroll-decor-android:1.0.4'
-    compile 'me.leolin:ShortcutBadger:1.1.17@aar'
+    implementation fileTree(include: '*.jar', dir: 'libs')
+    implementation 'me.everything:overscroll-decor-android:1.0.4'
+    implementation 'me.leolin:ShortcutBadger:1.1.17@aar'
     api 'com.alibaba:fastjson:1.1.70.android'
     api 'com.netease.nimlib:basesdk:6.3.0'
     api 'com.netease.nimlib:chatroom:6.3.0'
     api 'com.netease.nimlib:lucene:6.3.0'
     implementation 'com.netease.nimlib:push:6.3.0'
-    compile 'com.heima.iou:hmbasebizlocal:1.0.0'
-    compile 'com.heima.iou:hmpushlocal:1.0.0'
+    implementation 'com.heima.iou:hmbasebizlocal:1.0.0'
+    implementation 'com.heima.iou:hmpushlocal:1.0.0'
     implementation files('libs/vivo_pushsdk_v2.3.4.jar')
 }
 apply from: './maven_local.gradle'
